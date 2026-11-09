@@ -6,6 +6,7 @@ build/
 
 # 运行态与导出产物：生命周期与源码不同，一律不入库
 state/
+/runtime/
 .runtime/
 exports/
 *.log
