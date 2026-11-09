@@ -1,0 +1,22 @@
+# 依赖
+node_modules/
+
+# 构建期派生数据：由 scripts/build.py 从库内 md 真源重建
+build/
+
+# 运行态与导出产物：生命周期与源码不同，一律不入库
+state/
+.runtime/
+exports/
+*.log
+
+# 本机实值配置
+config/config.local.json
+
+
+# Python 字节码
+__pycache__/
+*.pyc
+
+# 本机运行时位置（每台机器不同，不入库）
+config/electron-home.txt

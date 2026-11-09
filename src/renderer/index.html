@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <title>配乐提示词生成器 · 项目85 C阶段</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>配乐提示词生成器</h1>
+      <p>项目 85 · C 阶段最小可运行窗口 · 模型卡层的人类侧输入面 + 渲染器</p>
+    </div>
+    <div id="statusPill" class="pill pill-idle">契约校验中…</div>
+  </header>
+
+  <section class="contract" id="contractBar">
+    <div><span class="k">数据版本</span><span class="v" id="cVersion">—</span></div>
+    <div><span class="k">源哈希前缀</span><span class="v mono" id="cHash">—</span></div>
+    <div><span class="k">模型</span><span class="v" id="cModel">—</span></div>
+    <div><span class="k">产物后缀</span><span class="v mono" id="cSuffix">—</span></div>
+    <div><span class="k">真源校验</span><span class="v" id="cSources">—</span></div>
+  </section>
+
+  <main class="grid">
+    <section class="card">
+      <h2>点选配置</h2>
+      <p class="hint">下拉项全部来自 <code>data.js</code> 派生词表；不允许自由输入自造风格词。换桶位会自动重填该桶主用词。</p>
+
+      <div class="row two">
+        <div class="field">
+          <label for="bucket">情绪桶位 / Bucket</label>
+          <select id="bucket"></select>
+        </div>
+        <div class="field">
+          <label for="topic">主题信息 / Cue</label>
+          <select id="topic"></select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>技能情绪词 / Mood（随 cue 只读派生，本轮不开放自定义）</label>
+        <div id="moodWords" class="checks"></div>
+      </div>
+
+      <div class="row three">
+        <div class="field">
+          <label for="instruments">主奏乐器 / Instruments</label>
+          <input id="instruments" type="text" readonly>
+        </div>
+        <div class="field">
+          <label for="bpm">BPM</label>
+          <input id="bpm" type="text" readonly>
+        </div>
+        <div class="field">
+          <label for="duration">建议时长</label>
+          <input id="duration" type="text" readonly>
+        </div>
+      </div>
+
+      <div class="row two">
+        <div class="field">
+          <label for="purposeProfile">用途剖面</label>
+          <input id="purposeProfile" type="text" value="通用配乐素材库">
+        </div>
+        <div class="field">
+          <label for="pictureFunction">画面功能</label>
+          <input id="pictureFunction" type="text" value="转场">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="moodArc">情绪走向（中文）</label>
+        <input id="moodArc" type="text" value="安静起 → 平稳铺陈 → 温和收束">
+      </div>
+
+      <div class="field">
+        <label for="paramDeviation">参数偏离</label>
+        <input id="paramDeviation" type="text" value="无（沿用 W25／SI80 基线）">
+      </div>
+
+      <div class="row two">
+        <div class="field">
+          <label for="exclude1">排除项 1</label>
+          <input id="exclude1" type="text" value="不写完整主题旋律">
+        </div>
+        <div class="field">
+          <label for="exclude2">排除项 2</label>
+          <input id="exclude2" type="text" value="不引入人声与戏曲音色">
+        </div>
+      </div>
+
+      <div class="row two">
+        <div class="field">
+          <label>负向词组 / Exclude（≤3 组）</label>
+          <div id="negativeGroups" class="checks"></div>
+        </div>
+        <div class="field">
+          <label for="itemVersion">条目版本</label>
+          <input id="itemVersion" type="text" value="v1">
+        </div>
+      </div>
+    </section>
+
+    <aside class="side">
+      <section class="card lock">
+        <h2>纯器乐锁死 <span class="tag">不可让渡</span></h2>
+        <div class="field">
+          <label for="lyricsBox">歌词框 / Lyrics（只读）</label>
+          <input id="lyricsBox" class="mono" type="text" value="[Instrumental]" readonly>
+        </div>
+        <div class="locked-line">
+          <input type="checkbox" checked disabled>
+          <span class="mono">no vocals</span>
+          <span class="muted">不可删</span>
+        </div>
+        <ul class="rules">
+          <li>不提供人声开关；不默认带人声歌曲。</li>
+          <li>不出现 <code>[Verse]</code> / <code>[Chorus]</code> / <code>[Bridge]</code> 歌曲结构。</li>
+          <li>SA3 与 MiniMax-Music3 仍为骨架／未实测／禁生成，界面不列出。</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2>导出闭环</h2>
+        <p class="hint">点选 → 七层字段 → 1 条 <code>-Suno.md</code> → 26 项静态自检 → 阶段闸门。产物只落库外。</p>
+        <button id="exportBtn" type="button">生成并导出 -Suno.md</button>
+        <pre id="resultBox" class="result">等待操作…</pre>
+      </section>
+
+      <section class="card scope">
+        <h2>本轮边界</h2>
+        <p>结构验证版：英文 Styles 由词表值与契约常量拼装，未调用 <code>suno-prompt-tool</code> 组织措辞，不可直接用于真实生成。真窗口实拍、跨机、Obsidian 渲染、Suno 实际生成／试听／回片均未实测。</p>
+      </section>
+    </aside>
+  </main>
+
+  <footer>真源：<code>6-资产-R/00-模板/06-配乐生成模板/</code> · 派生数据：<code>data.js</code> / <code>manifest.json</code> · 运行态全部留库外</footer>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
