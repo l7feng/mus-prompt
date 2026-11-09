@@ -201,6 +201,7 @@ ipcMain.on('auto:done', (_event, result) => {
 
 function createWindow() {
   win = new BrowserWindow({
+    icon: path.join(APP_ROOT, 'assets', 'icon.ico'),
     width: 1200,
     height: 920,
     minWidth: 980,
