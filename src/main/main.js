@@ -93,11 +93,20 @@ function loadContract() {
     return { role: s.role, path: s.path, ok: fs.existsSync(abs) && sha256(abs) === s.sha256 };
   });
   const sourceOk = sourceResults.every((r) => r.ok);
-  const skeletonOnly = data.models.filter((m) => m.id !== 'suno')
-    .every((m) => String(m.status).includes('骨架'));
+  // 非 Suno 模型一律不得转「现役」；「骨架／禁生成」与「探针实测中」同属非现役状态。
+  // 状态词用白名单，未知或含「现役」一律拒绝（fail-closed），避免真源状态变更被静默放行。
+  // 2026-11-09 人类裁决「放宽校验」：允许 SA3「探针实测中（待人类实测回报后转现役）」。
+  const NON_CURRENT_STATES = ['骨架', '探针实测中', '未实测', '禁生成'];
+  const nonCurrentOnly = data.models.filter((m) => m.id !== 'suno')
+    .every((m) => {
+      const s = String(m.status || '');
+      // 状态「探针实测中（待人类实测回报后转现役）」含「现役」二字但并非现役声明，
+      // 因此只按行首判定；白名单未命中同样拒绝（fail-closed）。
+      return !s.startsWith('现役') && NON_CURRENT_STATES.some((k) => s.includes(k));
+    });
   const modelOk = data.model.display === 'Suno' && data.model.status === '现役' &&
     data.product_suffix === '-Suno';
-  const ok = dataOk && sourceOk && skeletonOnly && modelOk;
+  const ok = dataOk && sourceOk && nonCurrentOnly && modelOk;
 
   return {
     ok,
@@ -109,7 +118,7 @@ function loadContract() {
     dataOk,
     sourceOk,
     sourceResults,
-    skeletonOnly,
+    nonCurrentOnly,
     model: {
       display: data.model.display,
       suffix: data.product_suffix,
