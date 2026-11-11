@@ -4,6 +4,7 @@
 
 | 日期 | 提交 | 说明 |
 | --- | --- | --- |
+| 2026-11-11 | `2499623` | 增加 AI 接入：`scripts/cli.py`（status／templates／fields／cues／schema／resolve／render）与 `scripts/mcp_server.py`（stdio、Streamable HTTP、旧版 SSE，Bearer 令牌与私网白名单）；`render.py` 增加 `--resolve-only`；AI 可自动解析取向卡，落盘限 `state/` 三子目录，无卡与自检失败即拦截 |
 | 2026-11-11 | `800444f` | 接入 S0 题材分流与 S1.5：中国/世界两套模板、四字段受控词表与 20 张取向卡；无卡不生成，中国音色域覆盖时显式降级；数据版本 `2026-11-11-02` |
 | 2026-11-11 | `0c38356` | 歌词框旁新增「复制 `[Instrumental]`」与「复制 `Instrumental`」两个按钮；主进程剪贴板写入只放行这两个常量，preload 增加第五个白名单动作 `copyText`，界面给出「已复制」反馈 |
 | 2026-11-11 | `2b2c208` | 更名 `mus-prompt`：产品显示名 `MUS Prompt`，界面窗口标题、HTML 标题与 H1 同步；本地源码仓与 GitHub 仓改名；便携包目录、exe 与桌面快捷方式同步 |
