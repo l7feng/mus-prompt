@@ -1,6 +1,6 @@
 'use strict';
 
-// 项目 85 C 阶段 · Electron 主进程
+// Electron 主进程
 // 职责：开真窗口、只读加载派生数据契约、接收点选配置、调用库外 render.py 导出。
 // 词表与规则真源仍是库内 md；本进程不内嵌词表、不写库内文件。
 
@@ -227,7 +227,7 @@ function createWindow() {
     height: 920,
     minWidth: 980,
     minHeight: 720,
-    title: 'MUS Prompt · 项目85 C阶段（Electron 最小窗口）',
+    title: 'MUS Prompt',
     backgroundColor: '#16181d',
     webPreferences: {
       preload: path.join(__dirname, '..', 'preload', 'preload.js'),

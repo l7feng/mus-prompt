@@ -157,9 +157,9 @@ function updateThemeCard() {
   const card = cardResolution.card;
   box.className = 'theme-card ' + (card ? (cardResolution.override ? 'warn' : 'ok') : 'bad');
   if (!card) {
-    box.innerHTML = '<h3>未命中取向卡</h3>' +
-      '<p class="bad-text">按模板未命中规则，无卡不生成；请调整四字段组合，或在该模板登记「待补卡」。' +
-      (activeTemplate.verified ? '' : ' 本模板卡集尚未实测验收。') + '</p>';
+    box.innerHTML = '<h3>没有匹配的取向卡</h3>' +
+      '<p class="bad-text">请调整题材分类，或换一个题材模板。' +
+      (activeTemplate.verified ? '' : ' 该模板的卡尚未验收，仅供参考。') + '</p>';
     $('exportBtn').disabled = true;
     return;
   }
@@ -171,10 +171,10 @@ function updateThemeCard() {
     '<dt>排除项</dt><dd>' + esc(card.excludes) + '</dd>' +
     '</dl>' +
     (cardResolution.override
-      ? '<p class="warn-text">音色域覆盖：卡默认「无特定」主奏降级为参考，按项目 S0 乐器口径执行。</p>'
+      ? '<p class="warn-text">所选音色不在该卡范围内，已按题材默认音色处理。</p>'
       : '') +
     (!activeTemplate.verified
-      ? '<p class="warn-text">该模板卡集未实测验收，仅作参考。</p>'
+      ? '<p class="warn-text">该模板的卡尚未验收，仅供参考。</p>'
       : '');
   $('exportBtn').disabled = false;
 }
@@ -185,18 +185,11 @@ function renderTemplate() {
   const badges = [];
   if (activeTemplate.default) badges.push('<span class="badge good">默认</span>');
   badges.push('<span class="badge ' + (activeTemplate.verified ? 'good' : 'warn') + '">' +
-    esc(activeTemplate.status) + '</span>');
+    (activeTemplate.verified ? '已验证' : '待验证') + '</span>');
   badges.push('<span class="badge">' + activeTemplate.cards.length + ' 张取向卡</span>');
   $('templateBadge').innerHTML = badges.join('');
   const c = activeTemplate.coverage;
-  const all = reg.coverage;
-  $('coverageLine').textContent =
-    '本模板：' + c.total + ' 个一级题材 · ' + c.with_card + ' 个有卡 · ' + c.cards +
-    ' 张卡 · ' + c.gaps + ' 个缺口' +
-    (c.real_gaps !== undefined ? '（实际需补 ' + c.real_gaps + '）' : '') +
-    '｜全库合计：' + all.themes + ' 个题材 · ' + all.with_card + ' 个有卡 · ' +
-    all.real_gaps + ' 个实缺（' + all.gaps + ' 个缺口，含兜底位）';
-  $('templateNote').textContent = activeTemplate.note || '';
+  $('coverageLine').textContent = c.with_card + ' / ' + c.total + ' 个题材有取向卡';
   renderS15Fields();
 }
 
@@ -207,16 +200,6 @@ function initTheme(data) {
     (t.default ? '（默认）' : '') + '</option>').join('');
   $('templateId').value = reg.default;
   renderTemplate();
-}
-
-function fillContract(c) {
-  $('cVersion').textContent = c.version;
-  $('cHash').textContent = c.hashPrefix;
-  $('cModel').textContent = c.model.display + ' · ' + c.model.status;
-  $('cSuffix').textContent = c.model.suffix;
-  const okCount = c.sourceResults.filter((r) => r.ok).length;
-  $('cSources').textContent = okCount + '/' + c.sourceResults.length +
-    (c.dataOk ? ' · data.js 哈希一致' : ' · data.js 哈希不一致');
 }
 
 function onTopicChange() {
@@ -230,7 +213,6 @@ function onTopicChange() {
   const primary = bucketRow ? splitWords(bucketRow.primary) : [];
   const selected = splitWords(row.mood_words);
   const ordered = selected.concat(primary.filter((w) => !selected.includes(w)));
-  // 首轮最小窗口：情绪词随 cue 只读派生；自定义词组与跨桶改判依据留 C 后续轮次。
   $('moodWords').innerHTML = ordered.map((w) =>
     '<label><input type="checkbox" value="' + esc(w) + '"' +
     (selected.includes(w) ? ' checked' : '') + ' disabled>' + esc(w) + '</label>').join('');
@@ -266,7 +248,7 @@ function initForm(data) {
 function collectSelection() {
   return {
     selection_id: 'C01',
-    source_note: 'Electron 最小窗口点选；词表类字段值全部来自 data.js 派生数据集，不允许自造风格词',
+    source_note: '界面点选；词表来自配乐模板',
     theme: {
       template_id: activeTemplate.id,
       template_status: activeTemplate.status,
@@ -299,15 +281,15 @@ function collectSelection() {
 
 async function runOnce() {
   if (!contract || !contract.ok) {
-    showResult('契约未通过，拒绝导出', 'fail');
-    return { ok: false, error: '契约未通过' };
+    showResult('模板数据异常，无法导出。', 'fail');
+    return { ok: false, error: '模板数据异常' };
   }
   if (!cardResolution || !cardResolution.card) {
-    showResult('S1.5 未命中取向卡，按模板未命中规则不生成。请调整四字段或切换模板。', 'fail');
-    return { ok: false, error: 'S1.5 无取向卡' };
+    showResult('没有匹配的取向卡，无法生成。请调整题材分类或换模板。', 'fail');
+    return { ok: false, error: '没有匹配的取向卡' };
   }
   $('exportBtn').disabled = true;
-  showResult('正在导出…', '');
+  showResult('正在生成…', '');
   let result;
   try {
     result = await window.p85.runExport(collectSelection());
@@ -316,14 +298,14 @@ async function runOnce() {
   }
   $('exportBtn').disabled = false;
 
-  const lines = [result.ok ? '导出完成' : '导出失败'];
-  if (result.summary) lines.push('静态自检：' + result.summary.PASS + ' PASS / ' + result.summary.FAIL + ' FAIL');
-  if (result.product) lines.push('成品：' + result.product);
-  if (result.selfcheck) lines.push('自检清单：' + result.selfcheck);
-  if (result.exitCode !== undefined) lines.push('render.py 退出码：' + result.exitCode);
-  if (result.error) lines.push('错误：' + result.error);
-  if (result.stderr) lines.push('stderr：' + result.stderr);
-  if (result.stdout) lines.push('--- render.py ---\n' + result.stdout);
+  const lines = [result.ok ? '生成完成' : '生成失败'];
+  if (result.summary) {
+    lines.push(result.ok
+      ? '检查通过 ' + result.summary.PASS + ' 项'
+      : '有 ' + result.summary.FAIL + ' 项检查未通过');
+  }
+  if (result.product) lines.push('文件：' + result.product.split(/[\\/]/).pop());
+  if (!result.ok && result.error) lines.push(result.error);
   showResult(lines.join('\n'), result.ok ? 'ok' : 'fail');
   return result;
 }
@@ -333,18 +315,14 @@ async function load() {
     const c = await window.p85.loadContract();
     contract = c;
     if (!c.ok) {
-      setStatus('bad', '拒绝加载：' + (c.error || '未知'));
+      setStatus('bad', '加载失败');
       $('exportBtn').disabled = true;
-      showResult('真源校验失败：' + (c.error || '') + '\n' +
-        JSON.stringify(c.sourceResults || [], null, 2), 'fail');
+      showResult('模板数据校验失败，请重新生成词表后再试。', 'fail');
       return;
     }
-    setStatus('good', '真源校验通过 · ' +
-      c.sourceResults.filter((r) => r.ok).length + '/' + c.sourceResults.length);
-    fillContract(c);
+    setStatus('good', '已载入');
     initForm(c.data);
-    showResult('契约加载完成：数据版本 ' + c.version + '，模型 ' +
-      c.model.display + c.model.suffix + '。点「生成并导出」开始闭环。', '');
+    showResult('点「生成并导出」开始。', '');
   } catch (e) {
     setStatus('bad', '加载异常');
     showResult(String(e && e.message ? e.message : e), 'fail');

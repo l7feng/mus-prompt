@@ -43,7 +43,6 @@ EXPORTS = pathlib.Path(_args.out) if _args.out else STATE / "exports"
 PRODUCT_NAME = _args.product or "01-点选闭环-Suno.md"
 SELFCHECK_FILE = pathlib.Path(_args.selfcheck) if _args.selfcheck else STATE / "selfcheck.json"
 STAGE = str(_args.stage).upper()
-STAGE_TITLE = "B阶段" if STAGE == "B" else "C阶段"
 STAGE_DESC = "B 阶段只读原型闭环" if STAGE == "B" else "C 阶段 Electron 最小窗口"
 
 checks = []
@@ -323,59 +322,43 @@ zh = (f"{fd['bucket']}纯器乐配乐，情绪词 {mood}，{fd['bpm']} BPM，"
       f"建议时长 {fd['duration']}，弧度 {arc_zh}。纯器乐织体、无演唱主旋律，"
       "无人声、无演唱、无说唱、无哼唱。")
 
-theme_line = (f"- 题材层（S1.5）：`{theme_tpl['id']}`（{theme_tpl['status']}）"
+status_text = "已验证" if theme_tpl.get("verified") else "待验证"
+theme_line = (f"- 题材：{theme_tpl['name']}｜状态：{status_text}"
               f"｜{field_pairs(theme_tpl, theme_fields)}")
 card_line = (f"- 取向卡：{card['anchor']}｜音阶调式：{card['scale']}"
              f"｜主奏乐器：{card['instruments']}｜织体空间：{card['texture']}")
 if card_override:
     card_line += "｜音色域覆盖：卡默认「无特定」主奏降级为参考，按项目 S0 乐器口径执行"
-sound_layer = f"{fd['instruments']}（取自共享层 13 条基线六列；S1.5 取向卡见上）"
+sound_layer = fd["instruments"]
 exclude_line = "；".join(tp["excludes"]) + "｜取向卡：" + card["excludes"]
-
-source_rows = "\n".join(
-    "| " + s["role"] + " | " + s["note"] + " | `" + s["path"] + "` |"
-    for s in data["sources"]
-)
 
 doc = f"""---
 type: 条目
-title: 项目85 {STAGE_TITLE}点选闭环验证条目 · {fd['bucket']} {fd['topic']}
+title: {fd['bucket']} {fd['topic']} · Suno 提示词
 created: {TODAY}
 updated: {TODAY}
 status: 待审核
 domain: 音频
-tags: [音频, 配乐, 提示词, Suno, 项目85, 题材层, {STAGE_TITLE}]
-source: {TODAY} 项目85 {STAGE_DESC}；数据由 build.py 从库内 md 派生，见「来源」
+tags: [音频, 配乐, 提示词, Suno]
+source: 配乐模板库
 model: Suno
 ---
 
-# 项目 85 {STAGE_TITLE}点选闭环验证条目 · {fd['bucket']} {fd['topic']}
-
-## 本页范围
-
-- 性质：{STAGE_DESC}的**结构验证版**产物，不是可交付音频提示词。英文 Styles 块只由词表值与契约常量拼装，**未调用 `suno-prompt-tool` 做措辞组织**，不可直接用于真实生成。
-- 数据版本：`{data['data_version']}`；派生数据 `data.js` 源哈希前缀 `{data_js_sha[:16]}`；校验清单 `manifest.json`／`selfcheck.json`（均在库外运行态目录）。
-- 模型：`suno`／`Suno`／`-Suno`／现役；StableAudio3 现役（2026-11-10 人类听感验收解锁）、MiniMax-Music3 冻结（2026-11-10 停止生成），两者均不在本应用可选项，本条不使用其词表。
-- 题材层：`{theme_tpl['id']}`／{theme_tpl['status']}；四字段与取向卡只提供声音语义，不写模型专有语法，情绪九桶与模型卡零改写。取向卡主奏与共享层基线不一致时，以项目 S0 乐器口径为准并登记偏差。
-- 本轮不生成音频、不试听、不回片；文本自检不等于音频验收。
-- 未实测边界：跨机、Obsidian 渲染、其他 Agent 触发、Suno 实际生成与听审；真窗口验证情况见项目 `Documentation.md`。`--gate phase` 只扫描项目目录内内容文件，本页在库外审阅区，三方一致由 `selfcheck.json` 覆盖。
+# {fd['bucket']} {fd['topic']} · Suno 提示词
 
 ## 条目
-
-### {sel['selection_id']} / {fd['bucket']} {fd['topic']}
 
 {theme_line}
 {card_line}
 - 用途剖面：{tp['purpose_profile']}
 - 画面功能：{tp['picture_function']}
-- 情绪层：{fd['bucket']}｜技能情绪词：{mood}｜走向：{tp['mood_arc_zh']}｜改判依据：无（两词均主归 {fd['bucket'][:2]} 桶）
+- 情绪层：{fd['bucket']}｜情绪词：{mood}｜走向：{tp['mood_arc_zh']}
 - 声音层：{sound_layer}
 - 参数层：BPM {fd['bpm']}｜建议时长 {fd['duration']}｜弧度 {arc_en}
 - 参数偏离：{tp['parameter_deviation']}
 - 排除项：{exclude_line}
-- 来源：七层字段位与词表指针见本页「来源」；派生数据 `{data['data_version']}`。
 
-Styles（英文整段，结构验证版）：
+Styles（英文整段）：
 
 ```
 {styles}
@@ -387,16 +370,7 @@ Styles（英文整段，结构验证版）：
 
 - 歌词框：`{lock['lyrics_box']}`（只读，不写进 Styles）
 - 负向词组：{'＋'.join(tp['negative_groups'])}（{len(tp['negative_groups'])} 组，单条不超过 3 组）
-- 文本自检项：编号唯一｜七层字段齐全｜英文块可整段复制且无中文｜含 no vocals｜负向词 ≤3 组｜情绪词可归桶｜参数偏离行存在｜中英成对｜歌词框 [Instrumental]｜无歌曲结构标签｜model／后缀／路由表三方一致
 - 条目版本：{tp['item_version']}
-
-## 来源
-
-| 代号 | 内容 | 路径 |
-| --- | --- | --- |
-{source_rows}
-
-- 约束依据：[项目85 方案详版](4-项目-P/85-配乐提示词生成器方案/01-方案详版-界面映射与D1-D4.md) 三条硬线；纯器乐双保险见 [Suno 模型卡](6-资产-R/00-模板/06-配乐生成模板/模型卡/Suno.md)；S1.5 题材层与取向卡见 `{theme_tpl['source']}`。
 """
 
 EXPORTS.mkdir(parents=True, exist_ok=True)
@@ -424,7 +398,7 @@ check("负向词组 ≤3 组", len(tp["negative_groups"]) <= 3, len(tp["negative
 check("参数偏离行存在", "参数偏离：" in text)
 check("中英成对（Styles 块与中文翻译均存在）", "Styles（英文整段" in text and "中文翻译：" in text)
 check("纯器乐文本含无人声口径", "无人声" in text and "纯器乐" in text)
-check("S1.5 题材模板验收状态写入成品", theme_tpl["status"] in text, theme_tpl["status"])
+check("S1.5 题材模板验收状态写入成品", status_text in text, status_text)
 check("S1.5 取向卡锚点写入成品", card["anchor"] in text, card["anchor"])
 check("S1.5 音色域覆盖如实标注", (not card_override) or "音色域覆盖" in text,
       f"override={card_override}")

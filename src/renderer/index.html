@@ -2,34 +2,26 @@
 <html lang="zh-Hans">
 <head>
   <meta charset="utf-8">
-  <title>MUS Prompt · 配乐提示词生成器</title>
+  <title>MUS Prompt</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="topbar">
     <div>
       <h1>MUS Prompt</h1>
-      <p>配乐提示词生成器 · 项目 85 · C 阶段最小可运行窗口 · 模型卡层的人类侧输入面 + 渲染器</p>
+      <p>影视配乐 · Suno 提示词</p>
     </div>
-    <div id="statusPill" class="pill pill-idle">契约校验中…</div>
+    <div id="statusPill" class="pill pill-idle">载入中…</div>
   </header>
-
-  <section class="contract" id="contractBar">
-    <div><span class="k">数据版本</span><span class="v" id="cVersion">—</span></div>
-    <div><span class="k">源哈希前缀</span><span class="v mono" id="cHash">—</span></div>
-    <div><span class="k">模型</span><span class="v" id="cModel">—</span></div>
-    <div><span class="k">产物后缀</span><span class="v mono" id="cSuffix">—</span></div>
-    <div><span class="k">真源校验</span><span class="v" id="cSources">—</span></div>
-  </section>
 
   <main class="grid">
     <div class="stack">
     <section class="card" id="s0Card">
-      <h2>题材分流 / S0</h2>
-      <p class="hint">默认中国题材。切换模板只换题材层，不动情绪九桶、模型卡、命名与闸门；未验收模板的取向卡仅作参考。</p>
+      <h2>题材</h2>
+      <p class="hint">先选题材模板，再确认分类与取向卡。</p>
       <div class="row two">
         <div class="field">
-          <label for="templateId">题材模板 / template_id</label>
+          <label for="templateId">题材模板</label>
           <select id="templateId"></select>
         </div>
         <div class="field">
@@ -38,39 +30,38 @@
         </div>
       </div>
       <p id="coverageLine" class="hint"></p>
-      <p id="templateNote" class="hint"></p>
     </section>
 
     <section class="card" id="s15Card">
-      <h2>S1.5 题材分类与取向卡</h2>
-      <p class="hint">四字段全部取自题材模板受控词表；命中取向卡后，声音变量作为 S3 的语义输入。无卡不生成。</p>
+      <h2>题材分类</h2>
+      <p class="hint">四项分类决定取向卡；没有匹配时不生成。</p>
       <div id="s15Fields" class="row two"></div>
       <div id="cardResult" class="theme-card"></div>
     </section>
 
     <section class="card">
-      <h2>点选配置</h2>
-      <p class="hint">下拉项全部来自 <code>data.js</code> 派生词表；不允许自由输入自造风格词。换桶位会自动重填该桶主用词。</p>
+      <h2>点选</h2>
+      <p class="hint">按词表选择，不开放自由输入。</p>
 
       <div class="row two">
         <div class="field">
-          <label for="bucket">情绪桶位 / Bucket</label>
+          <label for="bucket">情绪基调</label>
           <select id="bucket"></select>
         </div>
         <div class="field">
-          <label for="topic">主题信息 / Cue</label>
+          <label for="topic">场景主题</label>
           <select id="topic"></select>
         </div>
       </div>
 
       <div class="field">
-        <label>技能情绪词 / Mood（随 cue 只读派生，本轮不开放自定义）</label>
+        <label>情绪词（随场景带出）</label>
         <div id="moodWords" class="checks"></div>
       </div>
 
       <div class="row three">
         <div class="field">
-          <label for="instruments">主奏乐器 / Instruments</label>
+          <label for="instruments">主奏乐器</label>
           <input id="instruments" type="text" readonly>
         </div>
         <div class="field">
@@ -117,7 +108,7 @@
 
       <div class="row two">
         <div class="field">
-          <label>负向词组 / Exclude（≤3 组）</label>
+          <label>排除词组（最多 3 组）</label>
           <div id="negativeGroups" class="checks"></div>
         </div>
         <div class="field">
@@ -130,9 +121,9 @@
 
     <aside class="side">
       <section class="card lock">
-        <h2>纯器乐锁死 <span class="tag">不可让渡</span></h2>
+        <h2>纯器乐 <span class="tag">已锁定</span></h2>
         <div class="field">
-          <label for="lyricsBox">歌词框 / Lyrics（只读）</label>
+          <label for="lyricsBox">歌词</label>
           <input id="lyricsBox" class="mono" type="text" value="[Instrumental]" readonly>
         </div>
         <div class="copy-row">
@@ -146,27 +137,24 @@
           <span class="muted">不可删</span>
         </div>
         <ul class="rules">
-          <li>不提供人声开关；不默认带人声歌曲。</li>
-          <li>不出现 <code>[Verse]</code> / <code>[Chorus]</code> / <code>[Bridge]</code> 歌曲结构。</li>
-          <li>StableAudio3 现役（2026-11-10 人类听感验收解锁）、MiniMax-Music3 冻结（停止生成），均不在本应用可选项中；本应用仅产 Suno 提示词。</li>
+          <li>不提供人声开关。</li>
+          <li>不生成歌曲结构标签。</li>
         </ul>
       </section>
 
       <section class="card">
-        <h2>导出闭环</h2>
-        <p class="hint">点选 → 七层字段 → 1 条 <code>-Suno.md</code> → 静态自检（项数以 <code>selfcheck.json</code> 为准）→ 阶段闸门。产物只落库外。</p>
-        <button id="exportBtn" type="button">生成并导出 -Suno.md</button>
-        <pre id="resultBox" class="result">等待操作…</pre>
+        <h2>导出</h2>
+        <p class="hint">生成 1 条 Suno 提示词文件，保存在本机。</p>
+        <button id="exportBtn" type="button">生成并导出</button>
+        <pre id="resultBox" class="result">尚未生成</pre>
       </section>
 
       <section class="card scope">
-        <h2>本轮边界</h2>
-        <p>结构验证版：英文 Styles 由词表值与契约常量拼装，未调用 <code>suno-prompt-tool</code> 组织措辞，不可直接用于真实生成。真窗口实拍、跨机、Obsidian 渲染、Suno 实际生成／试听／回片均未实测。</p>
+        <h2>说明</h2>
+        <p>英文提示词由程序自动生成，使用前请人工核对。</p>
       </section>
     </aside>
   </main>
-
-  <footer>真源：<code>6-资产-R/00-模板/06-配乐生成模板/</code> · 派生数据：<code>data.js</code> / <code>manifest.json</code> · 运行态全部留库外</footer>
 
   <script src="renderer.js"></script>
 </body>

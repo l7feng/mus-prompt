@@ -13,6 +13,8 @@
 
 * { box-sizing: border-box; }
 
+html { overflow-anchor: none; }
+
 body {
   margin: 0;
   padding: 20px 24px 14px;
