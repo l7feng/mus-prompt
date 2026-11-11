@@ -23,7 +23,7 @@ source: 2026-11-08 按 6-资产-R/00-模板/07-软件项目布局模板 的 01-�
 | `src/renderer/` | 开发 | 界面页面、样式、界面状态 | 文件系统访问、内嵌词表副本 | 长期，随版本 |
 | `assets/` | 内容/设计 | 随版本发布的图标与静态资源 | 用户上传内容、运行时下载物 | 长期，随版本 |
 | `config/` | 运维 | `config.example.json` 模板与默认值、`electron-home.txt`（本机运行时位置） | 本机绝对路径、密钥（实值只在 `config.local.json` 与 `electron-home.txt`） | 模板随版本，实值本机 |
-| `scripts/` | 工具链 | `build.py` 派生数据、`render.py` 渲染自检、`launch.cmd` 启动器 | 一次性实验脚本、临时探测代码 | 长期，随版本 |
+| `scripts/` | 工具链 | `build.py` 派生数据、`render.py` 渲染自检、`cli.py` 无界面调用、`mcp_server.py` MCP 服务、`launch.cmd` 启动器 | 一次性实验脚本、临时探测代码 | 长期，随版本 |
 | `build/` | 构建 | `data.js`、`manifest.json` 等可重建派生数据 | 任何手写内容 | 临时，已忽略 |
 | `tests/` | 开发 | 冒烟与回归用例 | 大体积测试数据 | 长期，随版本 |
 | `docs/adr/` | 全员 | 布局与架构决策记录 | 自动生成文档 | 长期，随版本 |

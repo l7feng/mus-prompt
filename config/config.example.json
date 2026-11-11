@@ -3,5 +3,12 @@
   "python": "",
   "render_script": "scripts/render.py",
   "state_home": "",
-  "note": "本文件只放模板与默认值，随版本库走。本机实值写 config/config.local.json（已被忽略），或设环境变量 P85_PYTHON / P85_STATE_HOME。state_home 为空时运行态落 <仓根>/state/（同样被忽略）。"
+  "mcp": {
+    "host": "127.0.0.1",
+    "port": 8790,
+    "token_file": "config/mcp.token",
+    "allow_public": false,
+    "max_body_bytes": 1048576
+  },
+  "note": "本文件只放模板与默认值，随版本库走。本机实值写 config/config.local.json（已被忽略），或设环境变量 P85_PYTHON / P85_STATE_HOME。state_home 为空时运行态落 <仓根>/state/（同样被忽略）。mcp.host 改 0.0.0.0 才允许局域网；token_file 首次启动自动生成，已被忽略。"
 }

@@ -35,6 +35,7 @@ _parser.add_argument("--out", default=None, help="产物目录；默认 BASE/exp
 _parser.add_argument("--product", default=None, help="产物文件名；默认 01-点选闭环-Suno.md")
 _parser.add_argument("--selfcheck", default=None, help="自检清单路径；默认 BASE/selfcheck.json")
 _parser.add_argument("--stage", default="B", help="阶段标记 B / C，只影响文案与 report.stage")
+_parser.add_argument("--resolve-only", action="store_true", help="只解析 S1.5 取向卡并输出 JSON，不写成品")
 _args = _parser.parse_args()
 
 SEL_FILE = pathlib.Path(_args.selection) if _args.selection else STATE / "selection.json"
@@ -262,6 +263,23 @@ if card is not None:
     check("S1.5 音色域覆盖标记与渲染一致",
           bool(theme_sel.get("card_override")) == bool(card_override),
           f"override={card_override}")
+
+if _args.resolve_only:
+    resolution = {
+        "ok": bool(card is not None and fields_ok and theme_tpl is not None),
+        "template": ({"id": theme_tpl["id"], "status": theme_tpl["status"],
+                      "verified": theme_tpl.get("verified", False)}
+                     if theme_tpl else None),
+        "fields": theme_fields,
+        "fields_ok": bool(fields_ok),
+        "fields_detail": fields_detail,
+        "card": card,
+        "override": bool(card_override),
+        "candidates": card_candidates,
+        "failed_checks": [c for c in checks if c["result"] == "FAIL"],
+    }
+    print("RESOLVE_JSON " + json.dumps(resolution, ensure_ascii=False))
+    sys.exit(0 if resolution["ok"] else 1)
 
 if card is None or theme_tpl is None:
     SELFCHECK_FILE.parent.mkdir(parents=True, exist_ok=True)
