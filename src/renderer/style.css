@@ -126,6 +126,21 @@ button {
 button:hover { filter: brightness(1.08); }
 button:disabled { background: var(--line); color: var(--muted); cursor: not-allowed; }
 
+button.secondary {
+  width: auto;
+  padding: 6px 12px;
+  background: var(--card-2);
+  color: var(--text);
+  border: 1px solid var(--line);
+  font-size: 12px;
+  font-weight: 500;
+}
+button.secondary:hover { border-color: var(--accent); filter: none; }
+
+.copy-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 2px 0 6px; }
+.copy-feedback { color: var(--good); font-size: 12px; min-width: 56px; }
+.copy-feedback.fail { color: var(--bad); }
+
 .result {
   margin: 12px 0 0;
   padding: 10px;

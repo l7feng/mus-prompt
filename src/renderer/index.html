@@ -109,6 +109,11 @@
           <label for="lyricsBox">歌词框 / Lyrics（只读）</label>
           <input id="lyricsBox" class="mono" type="text" value="[Instrumental]" readonly>
         </div>
+        <div class="copy-row">
+          <button id="copyTagBtn" type="button" class="secondary">复制 [Instrumental]</button>
+          <button id="copyPlainBtn" type="button" class="secondary">复制 Instrumental</button>
+          <span id="copyFeedback" class="copy-feedback" aria-live="polite"></span>
+        </div>
         <div class="locked-line">
           <input type="checkbox" checked disabled>
           <span class="mono">no vocals</span>

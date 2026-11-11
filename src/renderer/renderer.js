@@ -163,9 +163,24 @@ async function load() {
   }
 }
 
+async function copyLocked(text) {
+  const fb = $('copyFeedback');
+  try {
+    const r = await window.p85.copyText(text);
+    fb.className = 'copy-feedback' + (r && r.ok ? '' : ' fail');
+    fb.textContent = r && r.ok ? '已复制' : '复制失败';
+  } catch (e) {
+    fb.className = 'copy-feedback fail';
+    fb.textContent = '复制失败';
+  }
+  setTimeout(() => { if (fb.textContent) fb.textContent = ''; }, 1600);
+}
+
 $('bucket').addEventListener('change', onBucketChange);
 $('topic').addEventListener('change', onTopicChange);
 $('exportBtn').addEventListener('click', () => { runOnce(); });
+$('copyTagBtn').addEventListener('click', () => { copyLocked('[Instrumental]'); });
+$('copyPlainBtn').addEventListener('click', () => { copyLocked('Instrumental'); });
 
 const ready = load();
 window.p85.onAutoExport(async () => {

@@ -4,7 +4,7 @@
 // 职责：开真窗口、只读加载派生数据契约、接收点选配置、调用库外 render.py 导出。
 // 词表与规则真源仍是库内 md；本进程不内嵌词表、不写库内文件。
 
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, clipboard } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
@@ -140,6 +140,14 @@ ipcMain.handle('contract:load', () => {
   } catch (e) {
     return { ok: false, error: String(e && e.message ? e.message : e) };
   }
+});
+
+// 纯器乐锁死文案的快捷复制：只放行白名单常量，不接受渲染进程传入任意文本。
+const COPY_WHITELIST = ['[Instrumental]', 'Instrumental'];
+ipcMain.handle('clipboard:write', (_event, text) => {
+  if (!COPY_WHITELIST.includes(text)) return { ok: false, error: '拒绝复制非白名单文本' };
+  clipboard.writeText(text);
+  return { ok: true, text };
 });
 
 ipcMain.handle('export:run', (_event, sel) => new Promise((resolve) => {
