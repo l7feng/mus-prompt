@@ -93,15 +93,19 @@ function loadContract() {
     return { role: s.role, path: s.path, ok: fs.existsSync(abs) && sha256(abs) === s.sha256 };
   });
   const sourceOk = sourceResults.every((r) => r.ok);
-  // 非 Suno 模型一律不得转「现役」；「骨架／禁生成」与「探针实测中」同属非现役状态。
-  // 状态词用白名单，未知或含「现役」一律拒绝（fail-closed），避免真源状态变更被静默放行。
+  // 非 Suno 模型默认不得转「现役」；「骨架／禁生成」「探针实测中」「冻结」同属非现役状态。
+  // 状态词用白名单，未知状态一律拒绝（fail-closed），避免真源状态变更被静默放行。
   // 2026-11-09 人类裁决「放宽校验」：允许 SA3「探针实测中（待人类实测回报后转现役）」。
-  const NON_CURRENT_STATES = ['骨架', '探针实测中', '未实测', '禁生成'];
+  // 2026-11-10 人类听感裁决：SA3 转「现役（人类听感验收解锁）」、MUS-3 转「冻结（停止生成）」。
+  // 仅 SA3 按该裁决放行「现役」行首；其余模型转现役或出现未知状态仍拒绝。本应用仍只产 Suno 提示词。
+  const NON_CURRENT_STATES = ['骨架', '探针实测中', '未实测', '禁生成', '冻结'];
+  const RULED_CURRENT = ['stable-audio-3']; // 2026-11-10 人类听感验收「SA3完全可以」解锁
   const nonCurrentOnly = data.models.filter((m) => m.id !== 'suno')
     .every((m) => {
       const s = String(m.status || '');
       // 状态「探针实测中（待人类实测回报后转现役）」含「现役」二字但并非现役声明，
       // 因此只按行首判定；白名单未命中同样拒绝（fail-closed）。
+      if (RULED_CURRENT.includes(m.id)) return s.startsWith('现役');
       return !s.startsWith('现役') && NON_CURRENT_STATES.some((k) => s.includes(k));
     });
   const modelOk = data.model.display === 'Suno' && data.model.status === '现役' &&
@@ -215,7 +219,7 @@ function createWindow() {
     height: 920,
     minWidth: 980,
     minHeight: 720,
-    title: '配乐提示词生成器 · 项目85 C阶段（Electron 最小窗口）',
+    title: 'MUS Prompt · 项目85 C阶段（Electron 最小窗口）',
     backgroundColor: '#16181d',
     webPreferences: {
       preload: path.join(__dirname, '..', 'preload', 'preload.js'),

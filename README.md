@@ -1,4 +1,6 @@
-# score-prompt-generator · 配乐提示词点选生成器
+# MUS Prompt（mus-prompt）· 配乐提示词点选生成器
+
+> 2026-11-11 起，产品名由「配乐提示词生成器 / score-prompt-generator」更名：界面窗口标题显示 `MUS Prompt`，源码仓目录与 GitHub 仓为 `mus-prompt`。
 
 从库内 `6-资产-R/00-模板/06-配乐生成模板/` 的 md 真源只读派生词表，界面点选后导出 1 条 `-Suno.md` 并跑静态自检。**不写库内文件、不生成音频。**
 
@@ -7,7 +9,7 @@
 ## 目录
 
 ```text
-score-prompt-generator/
+mus-prompt/
 ├── src/main/main.js            主进程：真窗口、契约校验、IPC、capturePage 实拍
 ├── src/preload/preload.js      四个白名单动作，界面拿不到 fs
 ├── src/renderer/               点选界面（HTML / CSS / JS），经 IPC 只读派生数据
@@ -69,6 +71,7 @@ npm start
 
 ## 关联
 
+- 源码远端：<https://github.com/l7feng/mus-prompt>
 - 目录契约：[STRUCTURE.md](STRUCTURE.md)｜布局依据：`6-资产-R/00-模板/07-软件项目布局模板/`
 - 词表真源：`6-资产-R/00-模板/06-配乐生成模板/`
 - 项目记录：`4-项目-P/85-配乐提示词生成器方案/`

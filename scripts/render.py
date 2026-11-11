@@ -117,10 +117,14 @@ check("派生数据每个集合都带来源指针与源哈希",
 check("样例标注 sample_only（不反推口径）", data["samples"]["sample_only"] is True)
 # 2026-11-09 人类裁决「放宽校验」：非 Suno 模型只要未转「现役」就不进入界面可选项；
 # 「探针实测中」与「骨架／禁生成」同属非现役状态，未知状态按 fail-closed 拒绝。
-NON_CURRENT_STATES = ("骨架", "探针实测中", "未实测", "禁生成")
-check("非 Suno 模型未转现役且不在界面可选项",
-      all(not m["status"].startswith("现役")
-          and any(k in m["status"] for k in NON_CURRENT_STATES)
+# 2026-11-10 人类听感裁决：SA3 解锁转「现役」、MUS-3「冻结」停止生成；
+# 仅 SA3 按裁决放行「现役」行首，「冻结」收录为非现役状态，其余未知状态仍拒绝。
+NON_CURRENT_STATES = ("骨架", "探针实测中", "未实测", "禁生成", "冻结")
+RULED_CURRENT = {"stable-audio-3"}  # 2026-11-10 人类听感验收「SA3完全可以」解锁
+check("非 Suno 模型状态与 2026-11-10 裁决一致且不在界面可选项",
+      all((m["status"].startswith("现役") if m["id"] in RULED_CURRENT
+           else (not m["status"].startswith("现役")
+                 and any(k in m["status"] for k in NON_CURRENT_STATES)))
           for m in data["models"] if m["id"] != "suno"))
 
 # --- 运行期：点选值闭环 ---
@@ -190,7 +194,7 @@ model: Suno
 
 - 性质：{STAGE_DESC}的**结构验证版**产物，不是可交付音频提示词。英文 Styles 块只由词表值与契约常量拼装，**未调用 `suno-prompt-tool` 做措辞组织**，不可直接用于真实生成。
 - 数据版本：`{data['data_version']}`；派生数据 `data.js` 源哈希前缀 `{data_js_sha[:16]}`；校验清单 `manifest.json`／`selfcheck.json`（均在库外运行态目录）。
-- 模型：`suno`／`Suno`／`-Suno`／现役；StableAudio3 为探针实测中（未转现役）、MiniMax-Music3 为骨架／未实测／禁生成，两者均不在界面可选项，本条不使用其词表。
+- 模型：`suno`／`Suno`／`-Suno`／现役；StableAudio3 现役（2026-11-10 人类听感验收解锁）、MiniMax-Music3 冻结（2026-11-10 停止生成），两者均不在本应用可选项，本条不使用其词表。
 - 本轮不生成音频、不试听、不回片；文本自检不等于音频验收。
 - 未实测边界：跨机、Obsidian 渲染、其他 Agent 触发、Suno 实际生成与听审；真窗口验证情况见项目 `Documentation.md`。`--gate phase` 只扫描项目目录内内容文件，本页在库外审阅区，三方一致由 `selfcheck.json` 覆盖。
 

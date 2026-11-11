@@ -1,6 +1,6 @@
 ---
 type: 存放规范
-title: score-prompt-generator 目录契约
+title: mus-prompt 目录契约
 created: 2026-11-08
 updated: 2026-11-08
 status: active
@@ -10,7 +10,7 @@ tags: [STRUCTURE, 目录布局, Electron, 落点路由]
 source: 2026-11-08 按 6-资产-R/00-模板/07-软件项目布局模板 的 01-存放规范骨架 + 05-桌面应用Electron 卡实化；先于本仓代码迁入成立
 ---
 
-# score-prompt-generator 目录契约
+# mus-prompt 目录契约
 
 > 复制自模板区 `01-共享层/01-存放规范骨架.md`，目录取值来自 `02-模型卡/05-桌面应用Electron.md`。新增任何文件前按「落点路由表」判定，命中即停。
 
