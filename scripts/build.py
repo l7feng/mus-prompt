@@ -5,6 +5,8 @@
   6-资产-R/00-模板/06-配乐生成模板/共享层/01..04
   6-资产-R/00-模板/06-配乐生成模板/模型卡/Suno.md
   6-资产-R/00-模板/06-配乐生成模板/样例/示例.md
+  6-资产-R/00-模板/06-配乐生成模板/题材分类模板/中国影视配乐题材分类模板（广电）.md
+  6-资产-R/00-模板/06-配乐生成模板/题材分类模板/国外影视题材分类模板.md
   4-项目-P/83-影视配乐提示词整理-Suno/01-模型适配路由表.md
   4-项目-P/83-影视配乐提示词整理-Suno/03-九桶提示词-日常温情-Suno.md（仅解析字段位名称）
 
@@ -26,7 +28,7 @@ BASE = pathlib.Path(__file__).resolve().parents[1]
 OUT = BASE / "build"          # 派生数据：机器生成、删了可重建，已在 .gitignore
 OUT.mkdir(parents=True, exist_ok=True)
 TODAY = datetime.date.today().isoformat()
-DATA_VERSION = TODAY + "-01"
+DATA_VERSION = TODAY + "-02"
 
 SOURCES = [
     ("contract", TPL / "README.md", "唯一契约与模型路由入口"),
@@ -36,6 +38,10 @@ SOURCES = [
     ("shared_workflow", TPL / "共享层/04-生成工作流.md", "S0–S5 与 G1–G4"),
     ("model_card_suno", TPL / "模型卡/Suno.md", "Suno 专有情绪词表、纯器乐双保险、弧度语言"),
     ("samples_suno", TPL / "样例/示例.md", "已填结果，仅作展示，不反推口径"),
+    ("theme_cn", TPL / "题材分类模板/中国影视配乐题材分类模板（广电）.md",
+     "S1.5 四字段、广电受控词表、10 张取向卡（已实测验收）"),
+    ("theme_intl", TPL / "题材分类模板/国外影视题材分类模板.md",
+     "S1.5 四字段、IMDb 28 类、10 张取向卡（待实测验收）"),
     ("route83", P83 / "01-模型适配路由表.md", "项目级产物后缀与状态"),
     ("reference_item", P83 / "03-九桶提示词-日常温情-Suno.md", "仅解析七层字段位名称，不复制提示词正文"),
 ]
@@ -85,6 +91,102 @@ def pick(tables, *keys):
 def section(text: str, title: str) -> str:
     m = re.search(r"^##\s+" + re.escape(title) + r"\s*$([\s\S]*?)(?=^##\s|\Z)", text, re.M)
     return m.group(1) if m else ""
+
+
+def split_multi(v: str):
+    """单元格里的受控值用全角/半角斜杠或顿号分隔。"""
+    return [x.strip() for x in re.split(r"[／/、]", clean(v)) if x.strip()]
+
+
+def split_tokens(v: str):
+    """取向卡锚点用全角斜杠分段，复合值再用间隔号拆开。"""
+    return [x.strip() for x in re.split(r"[／/、·]", clean(v)) if x.strip()]
+
+
+def norm_rule(v: str) -> str:
+    v = clean(v)
+    return "现实写实" if v == "写实" else v
+
+
+def field_values(text: str, name: str):
+    table = pick(parse_tables(text), "字段", "类别", "取值")
+    row = next((r for r in table[1:] if clean(r[0]) == name), None)
+    if not row:
+        raise KeyError("未找到四字段行：" + name)
+    return split_multi(row[2])
+
+
+def era_overlap(card_era: str, selected_era: str) -> bool:
+    """国外卡用年代区间（如 1940s–1950s），字段值可能是相邻区间或单值。"""
+    if card_era == selected_era:
+        return True
+    a = [x.strip() for x in card_era.replace("–", "-").split("-") if x.strip()]
+    b = [x.strip() for x in selected_era.replace("–", "-").split("-") if x.strip()]
+    if len(a) == 1 and len(b) == 1:
+        return False
+    return any(x in b for x in a)
+
+
+def parse_cn_cards(text: str):
+    table = pick(parse_tables(text), "锚点", "音阶调式")
+    cards = []
+    for i, r in enumerate(table[1:], 1):
+        if len(r) < 5:
+            continue
+        anchor = clean(r[0])
+        parts = split_multi(anchor)
+        if len(parts) != 3:
+            raise ValueError("中国题材卡锚点不是三段：" + anchor)
+        head, rule, timbre = parts
+        if "·" in head:
+            era, theme = head.split("·", 1)
+            key = head
+        elif head.startswith("重大"):
+            era, theme = "重大", head
+            key = "重大·" + head[len("重大"):]
+        else:
+            raise ValueError("中国题材卡锚点无法解析：" + anchor)
+        cards.append({
+            "id": "cn-%02d" % i,
+            "anchor": anchor,
+            "scale": clean(r[1]),
+            "instruments": clean(r[2]),
+            "texture": clean(r[3]),
+            "excludes": clean(r[4]),
+            "match": {
+                "theme_keys": [key], "era": era, "theme": theme,
+                "rule": [norm_rule(rule)], "timbre": split_tokens(timbre),
+                "restricted": era == "重大",
+            },
+        })
+    return cards
+
+
+def parse_intl_cards(text: str):
+    table = pick(parse_tables(text), "锚点", "音阶调式")
+    cards = []
+    for i, r in enumerate(table[1:], 1):
+        if len(r) < 5:
+            continue
+        anchor = clean(r[0])
+        parts = split_multi(anchor)
+        if len(parts) != 4:
+            raise ValueError("国外题材卡锚点不是四段：" + anchor)
+        genres, era, rule, timbre = parts
+        cards.append({
+            "id": "intl-%02d" % i,
+            "anchor": anchor,
+            "scale": clean(r[1]),
+            "instruments": clean(r[2]),
+            "texture": clean(r[3]),
+            "excludes": clean(r[4]),
+            "match": {
+                "genre_keys": [g.strip() for g in genres.split("·") if g.strip()],
+                "era": era, "rule": [norm_rule(rule)],
+                "timbre": split_tokens(timbre),
+            },
+        })
+    return cards
 
 
 def write_lf(path: pathlib.Path, text: str) -> None:
@@ -220,6 +322,166 @@ seven_layer = [n for n in field_names if n in SEVEN_LAYER_NAMES]
 if len(seven_layer) != 7:
     raise ValueError("参考成品未解析出完整七层字段位：" + str(seven_layer))
 
+# 7. 题材层：中国版（默认）与国外版，只读解析四字段、取向卡与覆盖缺口
+cn_text = src["theme_cn"]["text"]
+intl_text = src["theme_intl"]["text"]
+
+cn_era_table = pick(parse_tables(cn_text), "时代大类", "允许的题材锚点")
+cn_era_map = []
+for r in cn_era_table[1:]:
+    label = clean(r[0])
+    restricted = "另行办理" in label
+    era = "重大" if restricted else label.split("（")[0].strip()
+    anchors = [x.strip() for x in clean(r[1]).split("；")[0].split("、") if x.strip()]
+    cn_era_map.append({
+        "era": era, "label": label, "restricted": restricted,
+        "anchors": anchors,
+    })
+if sum(len(e["anchors"]) for e in cn_era_map) != 28:
+    raise ValueError("中国题材锚点不是 28 个：" +
+                     str([(e["era"], len(e["anchors"])) for e in cn_era_map]))
+
+cn_fields = [
+    {"key": "era", "label": "时代大类",
+     "options": [e["era"] for e in cn_era_map if not e["restricted"]]},
+    {"key": "anchor", "label": "题材锚点", "depends_on": "era",
+     "options_by": {e["era"]: e["anchors"] for e in cn_era_map if not e["restricted"]}},
+    {"key": "rule", "label": "世界规则", "options": field_values(cn_text, "世界规则")},
+    {"key": "timbre", "label": "文化音色域", "options": field_values(cn_text, "文化音色域")},
+]
+
+cn_cards = parse_cn_cards(cn_text)
+if len(cn_cards) != 10:
+    raise ValueError("中国题材取向卡不是 10 张：" + str(len(cn_cards)))
+
+cn_card_keys = {k for c in cn_cards for k in c["match"]["theme_keys"]}
+cn_themes = []
+for e in cn_era_map:
+    for a in e["anchors"]:
+        prefix = e["era"] if e["era"] != "重大" else "重大"
+        short = a[len(prefix):] if a.startswith(prefix) else a
+        key = e["era"] + "·" + short.replace("题材", "")
+        cn_themes.append({
+            "era": e["era"], "anchor": a, "key": key,
+            "has_card": key in cn_card_keys,
+            "fallback": a.endswith("其它"), "restricted": e["restricted"],
+        })
+cn_gaps = len(cn_themes) - sum(1 for t in cn_themes if t["has_card"])
+cn_fallback = sum(1 for t in cn_themes if t["fallback"])
+cn_coverage = {
+    "themes": cn_themes,
+    "total": len(cn_themes),
+    "with_card": sum(1 for t in cn_themes if t["has_card"]),
+    "cards": len(cn_cards),
+    "gaps": cn_gaps,
+    "fallback": cn_fallback,
+    "real_gaps": cn_gaps - cn_fallback,
+    "restricted": sum(1 for t in cn_themes if t["restricted"]),
+}
+
+intl_genre_table = pick(parse_tables(intl_text), "类型", "取值", "数量")
+intl_genres = []
+for r in intl_genre_table[1:]:
+    kind_raw = clean(r[0])
+    kind = "Objective" if kind_raw.startswith("Objective") else "Subjective"
+    for g in split_multi(r[1]):
+        intl_genres.append({"id": g, "kind": kind})
+if len(intl_genres) != 28:
+    raise ValueError("IMDb 一级题材不是 28 类：" + str(len(intl_genres)))
+
+intl_fields = [
+    {"key": "genre_primary", "label": "叙事类型锚点（主类型）",
+     "options": [g["id"] for g in intl_genres]},
+    {"key": "genre_secondary", "label": "次类型（≤1，可空）",
+     "options": [g["id"] for g in intl_genres], "allow_empty": True, "empty_label": "无"},
+    {"key": "era", "label": "Era / Decade", "options": field_values(intl_text, "Era / Decade")},
+    {"key": "rule", "label": "世界规则", "options": field_values(intl_text, "世界规则")},
+    {"key": "timbre", "label": "文化音色域", "options": field_values(intl_text, "文化音色域")},
+]
+
+intl_cards = parse_intl_cards(intl_text)
+if len(intl_cards) != 10:
+    raise ValueError("国外题材取向卡不是 10 张：" + str(len(intl_cards)))
+
+intl_genre_ids = {g["id"] for g in intl_genres}
+intl_card_genres = {g for c in intl_cards for g in c["match"]["genre_keys"]}
+intl_themes = [{"genre": g["id"], "kind": g["kind"],
+                "has_card": g["id"] in intl_card_genres} for g in intl_genres]
+intl_coverage = {
+    "themes": intl_themes,
+    "total": len(intl_themes),
+    "with_card": sum(1 for t in intl_themes if t["has_card"]),
+    "cards": len(intl_cards),
+    "gaps": sum(1 for t in intl_themes if not t["has_card"]),
+    "orphan_cards": [c["id"] for c in intl_cards
+                     if not any(g in intl_genre_ids for g in c["match"]["genre_keys"])],
+}
+
+coverage_all = {
+    "templates": 2,
+    "themes": cn_coverage["total"] + intl_coverage["total"],
+    "with_card": cn_coverage["with_card"] + intl_coverage["with_card"],
+    "gaps": cn_coverage["gaps"] + intl_coverage["gaps"],
+    "real_gaps": cn_coverage["real_gaps"] + intl_coverage["gaps"],
+    "cards": cn_coverage["cards"] + intl_coverage["cards"],
+}
+
+cn_default = {"era": "当代", "anchor": "当代都市", "rule": "现实写实", "timbre": "无特定"}
+intl_default = {"genre_primary": "Documentary", "genre_secondary": "",
+                "era": "2000s 至今", "rule": "现实写实", "timbre": "无特定"}
+
+
+def card_id_by_anchor(cards, anchor):
+    card = next((c for c in cards if c["anchor"] == clean(anchor)), None)
+    if not card:
+        raise ValueError("默认取向卡不存在：" + anchor)
+    return card["id"]
+
+
+theme_templates = {
+    "schema": "p85-theme-templates-v1",
+    "matcher_version": "p85-theme-match-v1",
+    "default": "nrta-cn-drama",
+    "coverage": coverage_all,
+    "templates": [
+        {
+            "id": "nrta-cn-drama",
+            "name": "中国影视配乐题材分类模板（广电）",
+            "source": src["theme_cn"]["path"],
+            "source_sha256": src["theme_cn"]["sha256"],
+            "status": "已实测验收",
+            "verified": True,
+            "default": True,
+            "note": ("重大题材（重大革命／重大历史）须人类裁决，不进入本界面常规四字段；"
+                     "重大历史卡仅在数据层保留。"),
+            "fields": cn_fields,
+            "era_map": cn_era_map,
+            "cards": cn_cards,
+            "coverage": cn_coverage,
+            "default_s15": cn_default,
+            "default_card_id": card_id_by_anchor(cn_cards, "当代·都市／写实／无特定"),
+        },
+        {
+            "id": "intl-imdb-production",
+            "name": "国外影视题材分类模板",
+            "source": src["theme_intl"]["path"],
+            "source_sha256": src["theme_intl"]["sha256"],
+            "status": "待实测验收",
+            "verified": False,
+            "default": False,
+            "note": ("卡集未实测验收；Spy·Heist、Synthwave 两张卡不对应 IMDb 一级题材，"
+                     "只走 cue 备注；无卡题材按模板 §6 不生成。"),
+            "fields": intl_fields,
+            "genres": intl_genres,
+            "cards": intl_cards,
+            "coverage": intl_coverage,
+            "default_s15": intl_default,
+            "default_card_id": card_id_by_anchor(
+                intl_cards, "Documentary / 2000s 至今 / 写实 / 无特定"),
+        },
+    ],
+}
+
 data = {
     "schema": "p85-derived-data-v1",
     "data_version": DATA_VERSION,
@@ -254,6 +516,9 @@ data = {
     "item_fields": ds("reference_item", field_names),
     "seven_layer_fields": ds("reference_item", seven_layer),
     "route83": ds("route83", r83),
+    "theme_templates": ds("theme_cn", theme_templates, {
+        "source_files": [src["theme_cn"]["path"], src["theme_intl"]["path"]],
+    }),
 }
 
 js_text = (
@@ -317,6 +582,11 @@ print("BUCKETS", len(buckets), "RUSSELL28", len(r28), "RULES", len(rules),
       "CUE13", len(cue_baseline), "MOOD15", len(mood15), "SAMPLES", len(samples))
 print("ITEM_FIELDS", len(field_names), "SEVEN_LAYER", len(seven_layer), seven_layer)
 print("ROUTE83_SUFFIX", [r["suffix"] for r in r83])
+print("THEMES", [(t["id"], t["status"], len(t["cards"])) for t in theme_templates["templates"]])
+print("COVERAGE", coverage_all)
+print("CN_COVERAGE", {k: cn_coverage[k] for k in
+                      ("total", "with_card", "cards", "gaps", "real_gaps")})
+print("INTL_COVERAGE", {k: intl_coverage[k] for k in ("total", "with_card", "cards", "gaps")})
 print("LOCK", instrumental_lock["lyrics_box"], "|", instrumental_lock["mandatory_negative"])
 print("DATA_JS_SHA", sha256(OUT / "data.js")[:16])
 print("MANIFEST_SHA", sha256(OUT / "manifest.json")[:16])

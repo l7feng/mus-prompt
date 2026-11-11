@@ -23,6 +23,31 @@
   </section>
 
   <main class="grid">
+    <div class="stack">
+    <section class="card" id="s0Card">
+      <h2>题材分流 / S0</h2>
+      <p class="hint">默认中国题材。切换模板只换题材层，不动情绪九桶、模型卡、命名与闸门；未验收模板的取向卡仅作参考。</p>
+      <div class="row two">
+        <div class="field">
+          <label for="templateId">题材模板 / template_id</label>
+          <select id="templateId"></select>
+        </div>
+        <div class="field">
+          <label>模板状态</label>
+          <div id="templateBadge" class="badges"></div>
+        </div>
+      </div>
+      <p id="coverageLine" class="hint"></p>
+      <p id="templateNote" class="hint"></p>
+    </section>
+
+    <section class="card" id="s15Card">
+      <h2>S1.5 题材分类与取向卡</h2>
+      <p class="hint">四字段全部取自题材模板受控词表；命中取向卡后，声音变量作为 S3 的语义输入。无卡不生成。</p>
+      <div id="s15Fields" class="row two"></div>
+      <div id="cardResult" class="theme-card"></div>
+    </section>
+
     <section class="card">
       <h2>点选配置</h2>
       <p class="hint">下拉项全部来自 <code>data.js</code> 派生词表；不允许自由输入自造风格词。换桶位会自动重填该桶主用词。</p>
@@ -101,6 +126,7 @@
         </div>
       </div>
     </section>
+    </div>
 
     <aside class="side">
       <section class="card lock">
@@ -128,7 +154,7 @@
 
       <section class="card">
         <h2>导出闭环</h2>
-        <p class="hint">点选 → 七层字段 → 1 条 <code>-Suno.md</code> → 26 项静态自检 → 阶段闸门。产物只落库外。</p>
+        <p class="hint">点选 → 七层字段 → 1 条 <code>-Suno.md</code> → 静态自检（项数以 <code>selfcheck.json</code> 为准）→ 阶段闸门。产物只落库外。</p>
         <button id="exportBtn" type="button">生成并导出 -Suno.md</button>
         <pre id="resultBox" class="result">等待操作…</pre>
       </section>

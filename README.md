@@ -4,6 +4,8 @@
 
 从库内 `6-资产-R/00-模板/06-配乐生成模板/` 的 md 真源只读派生词表，界面点选后导出 1 条 `-Suno.md` 并跑静态自检。**不写库内文件、不生成音频。**
 
+2026-11-11 起接入 S0 题材分流与 S1.5 四字段：中国模板（默认、取向卡已验收）与世界模板（待实测验收）各带受控词表与 10 张取向卡，无卡命中时不生成成品。
+
 > 当前状态：**C 阶段最小可运行窗口，界面为部分实现**（完整 15 栏目界面尚未完成）。本仓是开发中的源码，不是可交付成品；打包发布留到 C 阶段收官后，成品出口为 `D:/Ai-Files/Tools/Exe/`。
 
 ## 目录
@@ -11,13 +13,13 @@
 ```text
 mus-prompt/
 ├── src/main/main.js            主进程：真窗口、契约校验、IPC、capturePage 实拍
-├── src/preload/preload.js      四个白名单动作，界面拿不到 fs
+├── src/preload/preload.js      五个白名单动作，界面拿不到 fs
 ├── src/renderer/               点选界面（HTML / CSS / JS），经 IPC 只读派生数据
 ├── assets/icon.ico             应用图标
 ├── config/config.example.json  配置模板（不含本机实值）
 ├── config/electron-home.txt    本机 Electron 运行时位置（一行，忽略）
 ├── scripts/build.py            只读解析库内 md，派生 build/data.js + build/manifest.json
-├── scripts/render.py           点选配置 -> 七层字段 -> 1 条 -Suno.md -> 26 项静态自检
+├── scripts/render.py           点选配置 -> S1.5 取向卡 -> 七层字段 -> 1 条 -Suno.md -> 静态自检
 ├── scripts/launch.cmd          启动器（定位外部 electron，不内嵌运行时）
 ├── tests/smoke-launch.cmd      真启动冒烟
 ├── docs/adr/                   布局与架构决策
@@ -60,10 +62,10 @@ npm start
 ## 硬约束
 
 - 界面不内嵌词表；下拉项全部来自 `build/data.js`，由 `scripts/build.py` 从库内 md 只读派生。
-- 启动校验 `data.js` 与 `manifest.json` 的 SHA256，并逐份重算 9 份库内真源；不一致即拒绝加载。
+- 启动校验 `data.js` 与 `manifest.json` 的 SHA256，并逐份重算 11 份库内真源；不一致即拒绝加载。
 - 纯器乐锁死：歌词框 `[Instrumental]` 只读、`no vocals` 不可删、无人声开关、无歌曲结构标签。
-- 导出必须落盘 `-Suno.md` 并经 `render.py` 的 26 项静态自检；不自动写回库内。
-- 骨架模型 SA3／MiniMax-Music3 不出现在界面可选项中。
+- 导出必须落盘 `-Suno.md` 并经 `render.py` 静态自检（项数以 `selfcheck.json` 为准）；S1.5 无取向卡时不生成；不自动写回库内。
+- SA3 现役、MiniMax-Music3 冻结，均不出现在界面可选项中；本应用仅产 Suno 提示词。
 
 ## 未实测边界
 

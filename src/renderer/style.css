@@ -62,7 +62,7 @@ code { color: var(--accent); }
 .contract .v { font-size: 13px; }
 
 .grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 16px; }
-.side { display: flex; flex-direction: column; gap: 16px; }
+.stack, .side { display: flex; flex-direction: column; gap: 16px; }
 
 .card {
   background: var(--card);
@@ -140,6 +140,28 @@ button.secondary:hover { border-color: var(--accent); filter: none; }
 .copy-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 2px 0 6px; }
 .copy-feedback { color: var(--good); font-size: 12px; min-width: 56px; }
 .copy-feedback.fail { color: var(--bad); }
+
+.badges { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 2px; }
+.badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+.badge.good { color: var(--good); border-color: rgba(95, 211, 154, .5); }
+.badge.warn { color: var(--idle); border-color: rgba(229, 183, 105, .5); }
+
+.theme-card { margin-top: 2px; padding: 12px; background: var(--card-2); border: 1px solid var(--line); border-radius: 8px; }
+.theme-card.ok { border-color: rgba(95, 211, 154, .45); }
+.theme-card.warn { border-color: rgba(229, 183, 105, .45); }
+.theme-card.bad { border-color: rgba(242, 120, 124, .45); }
+.theme-card h3 { margin: 0 0 8px; font-size: 13px; }
+.theme-card dl { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 6px 10px; margin: 0; }
+.theme-card dt { color: var(--muted); font-size: 12px; }
+.theme-card dd { margin: 0; font-size: 13px; }
+.theme-card .warn-text { color: var(--idle); font-size: 12px; margin: 8px 0 0; }
+.theme-card .bad-text { color: var(--bad); font-size: 12px; margin: 8px 0 0; }
 
 .result {
   margin: 12px 0 0;
