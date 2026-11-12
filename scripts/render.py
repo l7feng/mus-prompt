@@ -203,14 +203,15 @@ else:
 check("派生数据每个集合都带来源指针与源哈希",
       all("source" in data[k] and "source_sha256" in data[k] and "values" in data[k]
           for k in ("buckets", "russell_28", "cue_baseline", "suno_mood_15",
-                    "seven_layer_fields", "samples", "route83", "theme_templates")))
+                    "seven_layer_fields", "samples", "theme_templates")))
 check("样例标注 sample_only（不反推口径）", data["samples"]["sample_only"] is True)
 # 2026-11-09 人类裁决「放宽校验」：非 Suno 模型只要未转「现役」就不进入界面可选项；
 # 「探针实测中」与「骨架／禁生成」同属非现役状态，未知状态按 fail-closed 拒绝。
 # 2026-11-10 人类听感裁决：SA3 解锁转「现役」、MUS-3「冻结」停止生成；
 # 仅 SA3 按裁决放行「现役」行首，「冻结」收录为非现役状态，其余未知状态仍拒绝。
+# 2026-11-11 人类裁决：YuE2 转现役（纯器乐轨），同步放行「现役」行首。
 NON_CURRENT_STATES = ("骨架", "探针实测中", "未实测", "禁生成", "冻结")
-RULED_CURRENT = {"stable-audio-3"}  # 2026-11-10 人类听感验收「SA3完全可以」解锁
+RULED_CURRENT = {"stable-audio-3", "yue2"}  # 2026-11-10 SA3 / 2026-11-11 YuE2 听感与用途裁决
 check("非 Suno 模型状态与 2026-11-10 裁决一致且不在界面可选项",
       all((m["status"].startswith("现役") if m["id"] in RULED_CURRENT
            else (not m["status"].startswith("现役")
@@ -221,11 +222,16 @@ check("非 Suno 模型状态与 2026-11-10 裁决一致且不在界面可选项"
 rows = data["cue_baseline"]["values"]
 matched = [r for r in rows if
            r["bucket"] == fd["bucket"] and r["topic"] == fd["topic"] and
-           r["instruments"] == fd["instruments"] and r["bpm"] == fd["bpm"] and
-           r["duration"] == fd["duration"] and
-           r["mood_words"] == " / ".join(fd["mood_words"])]
-check("点选配置命中共享层 13 条基线中的一行", len(matched) == 1,
+           r["bpm"] == fd["bpm"] and r["duration"] == fd["duration"]]
+check("点选配置命中共享层 28 词基线中的一行", len(matched) == 1,
       fd["bucket"] + " / " + fd["topic"])
+
+word = fd["topic"].split(" ")[0]
+r28_row = next((x for x in data["russell_28"]["values"] if x["word"] == word), None)
+check("所选词落在 Russell 28 词母表内（母表闭环）", r28_row is not None, word)
+check("一词一桶（词级）：所选词的母表归桶与点选桶一致",
+      r28_row is not None and r28_row["bucket"] == fd["bucket"],
+      word + " -> " + (r28_row["bucket"] if r28_row else "?"))
 
 all_vocab = set()
 for r in data["suno_mood_15"]["values"]:
@@ -241,9 +247,9 @@ primary = set(split_words(bucket_row["primary"])) if bucket_row else set()
 check("一词一桶：所选情绪词主归桶与点选桶一致（无跨桶改判）",
       all(w in primary for w in fd["mood_words"]),
       "primary=" + str(sorted(primary)))
-check("九桶定义可解析且桶位命中",
+check("八桶定义可解析且桶位命中",
       any(b["id"] == fd["bucket"] for b in data["buckets"]["values"]))
-check("七层字段位来自库内参考成品，不是渲染器硬编码",
+check("七层字段位来自库内方案详版（项目 85），不是渲染器硬编码",
       data["seven_layer_fields"]["values"] ==
       ["用途剖面", "画面功能", "情绪层", "声音层", "参数层", "参数偏离", "排除项"])
 
@@ -312,13 +318,16 @@ if card is None or theme_tpl is None:
 arc_en = lock["arc_language"].replace("→", "->")
 arc_zh = lock["arc_language"]
 mood = " / ".join(fd["mood_words"])
+# 28 词基线口径：Suno 情绪词取所在桶主用词；所选词以英文 keynote 句进入 Styles，保证同桶词在文本层可区分。
 styles = (
-    f"{mood} instrumental BGM. {fd['bpm']} BPM, {fd['duration']} arc: {arc_en}. "
+    f"{mood} instrumental BGM. Emotional keynote: {word.lower()}. "
+    f"{fd['bpm']} BPM, {fd['duration']} arc: {arc_en}. "
     "Pure instrumental texture, no lead vocal melody. "
     + lock["mandatory_negative_full"] + " "
     + "Locked: " + lock["mandatory_negative"] + ", instrumental only."
 )
-zh = (f"{fd['bucket']}纯器乐配乐，情绪词 {mood}，{fd['bpm']} BPM，"
+zh = (f"{fd['bucket']}纯器乐配乐，基调词 {word}（{r28_row['zh'] if r28_row else ''}），"
+      f"情绪词 {mood}，{fd['bpm']} BPM，"
       f"建议时长 {fd['duration']}，弧度 {arc_zh}。纯器乐织体、无演唱主旋律，"
       "无人声、无演唱、无说唱、无哼唱。")
 
@@ -406,10 +415,10 @@ check("S1.5 音色域覆盖如实标注", (not card_override) or "音色域覆�
 suffix_name = re.search(r"-(\w+)\.md$", PRODUCT_NAME).group(1)
 model_value = re.search(r"^model:[ \t]*(\S+)", fm, re.M).group(1)
 suffix_readme = data["product_suffix"].lstrip("-")
-suffix_83 = next(r["suffix"].lstrip("-") for r in data["route83"]["values"] if r["id"] == "suno")
-check("model／文件名后缀／README 路由表／项目83 路由表四方一致",
-      model_value == suffix_name == suffix_readme == suffix_83,
-      f"{model_value} / {suffix_name} / {suffix_readme} / {suffix_83}")
+suffix_model_card = data["model"]["suffix"].lstrip("-") if data.get("model", {}).get("suffix") else suffix_readme
+check("model／文件名后缀／README 路由表／模型卡路由四方一致",
+      model_value == suffix_name == suffix_readme == suffix_model_card,
+      f"{model_value} / {suffix_name} / {suffix_readme} / {suffix_model_card}")
 
 product_rel = product.relative_to(BASE).as_posix() if product.is_relative_to(BASE) else str(product)
 report = {

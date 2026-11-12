@@ -7,11 +7,14 @@
   6-资产-R/00-模板/06-配乐生成模板/样例/示例.md
   6-资产-R/00-模板/06-配乐生成模板/题材分类模板/中国影视配乐题材分类模板（广电）.md
   6-资产-R/00-模板/06-配乐生成模板/题材分类模板/国外影视题材分类模板.md
-  4-项目-P/83-影视配乐提示词整理-Suno/01-模型适配路由表.md
-  4-项目-P/83-影视配乐提示词整理-Suno/03-九桶提示词-日常温情-Suno.md（仅解析字段位名称）
+  5-领域-A/06-软件制作/85-配乐提示词生成器方案/01-方案详版-界面映射与D1-D4.md（仅解析七层字段位名称）
+
+  2026-11-12 适配：项目 95 已将共享层重构为「28 词基线」（八桶、词级基线、单集词映射），
+  本脚本按新表结构解析；项目 83 已删入回收站，路由表源移除（模型路由以 README 路由表为准），
+  七层字段位名称改从项目 85 方案详版解析。
 
 约束：库内零改写；派生数据只含「指针 + 值 + 来源路径」，不复制规则正文；
-      不内嵌第二份词表；样例标注 sample_only，不反推口径；骨架模型保持禁生成。
+      不内嵌第二份词表；样例标注 sample_only，不反推口径；非现役模型保持禁生成。
 """
 from __future__ import annotations
 
@@ -23,7 +26,7 @@ import re
 
 VAULT = pathlib.Path("D:/1-个人知识库_Vault")
 TPL = VAULT / "6-资产-R/00-模板/06-配乐生成模板"
-P83 = VAULT / "4-项目-P/83-影视配乐提示词整理-Suno"
+P85 = VAULT / "5-领域-A/06-软件制作/85-配乐提示词生成器方案"
 BASE = pathlib.Path(__file__).resolve().parents[1]
 OUT = BASE / "build"          # 派生数据：机器生成、删了可重建，已在 .gitignore
 OUT.mkdir(parents=True, exist_ok=True)
@@ -42,8 +45,7 @@ SOURCES = [
      "S1.5 四字段、广电受控词表、10 张取向卡（已实测验收）"),
     ("theme_intl", TPL / "题材分类模板/国外影视题材分类模板.md",
      "S1.5 四字段、IMDb 28 类、10 张取向卡（待实测验收）"),
-    ("route83", P83 / "01-模型适配路由表.md", "项目级产物后缀与状态"),
-    ("reference_item", P83 / "03-九桶提示词-日常温情-Suno.md", "仅解析七层字段位名称，不复制提示词正文"),
+    ("reference_item", P85 / "01-方案详版-界面映射与D1-D4.md", "仅解析七层字段位名称，不复制提示词正文"),
 ]
 
 FORBIDDEN_STRUCTURES = ["[Verse]", "[Chorus]", "[Bridge]"]
@@ -225,7 +227,7 @@ models = [{
 } for r in rt[1:] if len(r) >= 5]
 suno = next(m for m in models if m["id"] == "suno")
 
-# 2. 共享层：九桶 / Russell 28 词 / 校验规则接口（只取编号与名称）
+# 2. 共享层：八桶 / Russell 28 词母表 / 校验规则接口（只取编号与名称）
 et = parse_tables(src["shared_emotion"]["text"])
 buckets = [{
     "id": clean(r[0]), "quadrant": clean(r[1]), "axis": clean(r[2]),
@@ -233,30 +235,41 @@ buckets = [{
 } for r in pick(et, "桶位", "象限", "目标情绪状态")[1:] if len(r) >= 5]
 
 r28 = []
-for r in pick(et, "序", "词", "象限")[1:]:
-    if len(r) >= 6:
-        r28.append({"n": int(clean(r[0])), "word": clean(r[1]), "quadrant": clean(r[2])})
-        r28.append({"n": int(clean(r[3])), "word": clean(r[4]), "quadrant": clean(r[5])})
+for r in pick(et, "序", "词", "归桶")[1:]:
+    if len(r) >= 5 and clean(r[0]).isdigit():
+        r28.append({"n": int(clean(r[0])), "word": clean(r[1]), "zh": clean(r[2]),
+                    "quadrant": clean(r[3]), "bucket": clean(r[4])})
 r28.sort(key=lambda x: x["n"])
+if len(r28) != 28:
+    raise ValueError("Russell 28 词母表不是 28 词：" + str(len(r28)))
 
 rules = [{"n": int(m.group(1)), "name": m.group(2).strip()}
          for m in re.finditer(r"^\s*(\d+)\.\s+\*\*(.+?)\*\*",
                               section(src["shared_emotion"]["text"], "校验规则"), re.M)]
 
-# 3. 共享层：13 条基线 / 全局设定 / 每集套用 / 命名格式槽位 / 流程与闸门
+# 3. 共享层：28 词基线 / 全局设定 / 单集词映射 / 命名格式槽位 / 流程与闸门
 ct = parse_tables(src["shared_cue"]["text"])
-cue_baseline = [{
-    "bucket": clean(r[0]), "topic": clean(r[1]), "mood_words": clean(r[2]),
-    "bpm": clean(r[3]), "duration": clean(r[4]), "instruments": clean(r[5]),
-    "use": clean(r[6]),
-} for r in pick(ct, "桶位", "主题信息", "BPM")[1:] if len(r) >= 7]
+cue_baseline = []
+for r in pick(ct, "桶位", "BPM")[1:]:
+    if len(r) >= 9 and clean(r[0]).isdigit():
+        word, zh = clean(r[1]), clean(r[2])
+        cue_baseline.append({
+            "bucket": clean(r[3]),
+            "topic": (word + " " + zh).strip(),
+            "mood_words": word,
+            "bpm": clean(r[5]), "duration": clean(r[6]),
+            "instruments": clean(r[7]),
+            "use": clean(r[8]),
+        })
+if len(cue_baseline) != 28:
+    raise ValueError("28 词基线不是 28 行：" + str(len(cue_baseline)))
 
 global_settings = [{"field": clean(r[0]), "value": clean(r[1])}
                    for r in pick(ct, "项目", "设定")[1:] if len(r) >= 2]
 
 episode_map = [{"segment": clean(r[0]), "span": clean(r[1]),
                 "cue": clean(r[2]), "edit": clean(r[3])}
-               for r in pick(ct, "单集段落", "配乐")[1:] if len(r) >= 4]
+               for r in pick(ct, "单集段落", "剪辑要点")[1:] if len(r) >= 4]
 
 nt = parse_tables(src["shared_naming"]["text"])
 naming_fields = [clean(r[0]) for r in pick(nt, "字段", "规则")[1:] if r]
@@ -290,7 +303,7 @@ instrumental_lock = {
     "mandatory_negative_full": "No vocals, no singing, no rap, no humming.",
     "arc_language": arc_m.group(0),
     "forbidden_structures": FORBIDDEN_STRUCTURES,
-    "forbidden_source": "4-项目-P/85-配乐提示词生成器方案/01-方案详版-界面映射与D1-D4.md（硬线三）",
+    "forbidden_source": "5-领域-A/06-软件制作/85-配乐提示词生成器方案/01-方案详版-界面映射与D1-D4.md（硬线三）",
     "vocal_switch": "disabled",
 }
 
@@ -306,21 +319,16 @@ for chunk in re.split(r"^###\s+", src["samples_suno"]["text"], flags=re.M)[1:]:
                         "styles_en": en.group(1).strip(),
                         "zh": zh.group(1).strip() if zh else ""})
 
-# 6. 项目 83 路由表 + 参考成品的字段位名称
-r83 = [{
-    "id": clean(r[0]), "card": clean(r[1]), "suffix": clean(r[2]), "status": clean(r[3]),
-} for r in pick(parse_tables(src["route83"]["text"]), "模型 ID", "产物后缀")[1:] if len(r) >= 4]
-
+# 6. 参考口径的七层字段位名称（项目 85 方案详版；原项目 83 参考件已随目录删除）
 ref = src["reference_item"]["text"]
-field_names = []
-for m in re.finditer(r"^-\s+([^：\n]+)：", ref, re.M):
-    name = m.group(1).strip()
-    if name not in field_names:
-        field_names.append(name)
+m7 = re.search(r"七层字段骨架：([^\n]+)", ref)
+if not m7:
+    raise ValueError("方案详版未检出七层字段骨架行")
+field_names = [x.strip() for x in m7.group(1).split("／") if x.strip()]
 SEVEN_LAYER_NAMES = ["用途剖面", "画面功能", "情绪层", "声音层", "参数层", "参数偏离", "排除项"]
 seven_layer = [n for n in field_names if n in SEVEN_LAYER_NAMES]
 if len(seven_layer) != 7:
-    raise ValueError("参考成品未解析出完整七层字段位：" + str(seven_layer))
+    raise ValueError("七层字段位未解析完整：" + str(seven_layer))
 
 # 7. 题材层：中国版（默认）与国外版，只读解析四字段、取向卡与覆盖缺口
 cn_text = src["theme_cn"]["text"]
@@ -515,7 +523,6 @@ data = {
     "samples": ds("samples_suno", samples, {"sample_only": True}),
     "item_fields": ds("reference_item", field_names),
     "seven_layer_fields": ds("reference_item", seven_layer),
-    "route83": ds("route83", r83),
     "theme_templates": ds("theme_cn", theme_templates, {
         "source_files": [src["theme_cn"]["path"], src["theme_intl"]["path"]],
     }),
@@ -532,7 +539,7 @@ manifest = {
     "schema": "p85-build-manifest-v1",
     "data_version": DATA_VERSION,
     "generated_at": data["generated_at"],
-    "project": "4-项目-P/85-配乐提示词生成器方案",
+    "project": "5-领域-A/06-软件制作/85-配乐提示词生成器方案",
     "stage": "B 只读原型闭环",
     "model": {"id": suno["id"], "display": suno["display"],
               "model_card": src["model_card_suno"]["path"],
@@ -581,7 +588,6 @@ print("SKELETON", [m["display"] for m in manifest["skeleton_models"]])
 print("BUCKETS", len(buckets), "RUSSELL28", len(r28), "RULES", len(rules),
       "CUE13", len(cue_baseline), "MOOD15", len(mood15), "SAMPLES", len(samples))
 print("ITEM_FIELDS", len(field_names), "SEVEN_LAYER", len(seven_layer), seven_layer)
-print("ROUTE83_SUFFIX", [r["suffix"] for r in r83])
 print("THEMES", [(t["id"], t["status"], len(t["cards"])) for t in theme_templates["templates"]])
 print("COVERAGE", coverage_all)
 print("CN_COVERAGE", {k: cn_coverage[k] for k in

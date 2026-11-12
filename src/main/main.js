@@ -97,9 +97,10 @@ function loadContract() {
   // 状态词用白名单，未知状态一律拒绝（fail-closed），避免真源状态变更被静默放行。
   // 2026-11-09 人类裁决「放宽校验」：允许 SA3「探针实测中（待人类实测回报后转现役）」。
   // 2026-11-10 人类听感裁决：SA3 转「现役（人类听感验收解锁）」、MUS-3 转「冻结（停止生成）」。
-  // 仅 SA3 按该裁决放行「现役」行首；其余模型转现役或出现未知状态仍拒绝。本应用仍只产 Suno 提示词。
+  // 2026-11-11 人类裁决：YuE2 转现役（纯器乐轨），同步放行。
+  // 仅 SA3 / YuE2 按各自裁决放行「现役」行首；其余模型转现役或出现未知状态仍拒绝。本应用仍只产 Suno 提示词。
   const NON_CURRENT_STATES = ['骨架', '探针实测中', '未实测', '禁生成', '冻结'];
-  const RULED_CURRENT = ['stable-audio-3']; // 2026-11-10 人类听感验收「SA3完全可以」解锁
+  const RULED_CURRENT = ['stable-audio-3', 'yue2']; // 2026-11-10 SA3 / 2026-11-11 YuE2 裁决解锁
   const nonCurrentOnly = data.models.filter((m) => m.id !== 'suno')
     .every((m) => {
       const s = String(m.status || '');

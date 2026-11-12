@@ -205,17 +205,18 @@ function initTheme(data) {
 function onTopicChange() {
   const row = currentCue();
   if (!row) return;
-  $('instruments').value = row.instruments;
+  // 基线主奏乐器为〈项目填〉占位时留空，交由项目口径填写。
+  $('instruments').value = (row.instruments && row.instruments.indexOf('项目填') === -1)
+    ? row.instruments : '';
   $('bpm').value = row.bpm;
   $('duration').value = row.duration;
 
   const bucketRow = contract.data.suno_mood_by_bucket.values.find((r) => r.bucket === row.bucket);
+  // 28 词基线口径：Suno 情绪词取所在桶主用词；所选词身份由 topic（词）携带，不进复选框。
   const primary = bucketRow ? splitWords(bucketRow.primary) : [];
-  const selected = splitWords(row.mood_words);
-  const ordered = selected.concat(primary.filter((w) => !selected.includes(w)));
-  $('moodWords').innerHTML = ordered.map((w) =>
+  $('moodWords').innerHTML = primary.map((w) =>
     '<label><input type="checkbox" value="' + esc(w) + '"' +
-    (selected.includes(w) ? ' checked' : '') + ' disabled>' + esc(w) + '</label>').join('');
+    ' checked disabled>' + esc(w) + '</label>').join('');
 }
 
 function primaryOf(bucket) {
@@ -228,9 +229,8 @@ function onBucketChange() {
   const rows = contract.data.cue_baseline.values.filter((r) => r.bucket === bucket);
   $('topic').innerHTML = rows.map((r) =>
     '<option value="' + esc(r.topic) + '">' + esc(r.topic) + ' · ' + esc(r.use) + '</option>').join('');
-  // 默认选第一条「情绪词全部主归本桶」的 cue，避开需留改判依据的跨桶词。
-  const preferred = rows.find((r) => splitWords(r.mood_words)
-    .every((w) => primaryOf(r.bucket).includes(w))) || rows[0];
+  // 默认选第一条本桶词（28 词基线一词一桶，全部同桶）。
+  const preferred = rows[0];
   if (preferred) $('topic').value = preferred.topic;
   onTopicChange();
 }
