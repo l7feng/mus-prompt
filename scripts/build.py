@@ -228,11 +228,25 @@ models = [{
 suno = next(m for m in models if m["id"] == "suno")
 
 # 2. 共享层：八桶 / Russell 28 词母表 / 校验规则接口（只取编号与名称）
+# 2026-11-12 库内改版：桶表头由「桶位｜象限｜轴｜目标情绪状态｜戏剧功能」改为
+# 「桶位｜论文类·角度｜目标情绪状态｜覆盖词｜数｜戏剧功能」。派生口径改按新表头取值，
+# 下游（render.py / cli.py）只认 id 与 target，故 quadrant/axis 继续保留为兼容字段。
 et = parse_tables(src["shared_emotion"]["text"])
-buckets = [{
-    "id": clean(r[0]), "quadrant": clean(r[1]), "axis": clean(r[2]),
-    "target": clean(r[3]), "dramatic": clean(r[4]),
-} for r in pick(et, "桶位", "象限", "目标情绪状态")[1:] if len(r) >= 5]
+buckets = []
+for r in pick(et, "桶位", "目标情绪状态")[1:]:
+    if len(r) < 3:
+        continue
+    cls_angle = clean(r[1])
+    cls, _, angle = cls_angle.partition("·")
+    buckets.append({
+        "id": clean(r[0]), "quadrant": cls.strip(), "axis": angle.strip(),
+        "target": clean(r[2]),
+        "words": clean(r[3]) if len(r) > 3 else "",
+        "count": clean(r[4]) if len(r) > 4 else "",
+        "dramatic": clean(r[5]) if len(r) > 5 else "",
+    })
+if len(buckets) != 8:
+    raise ValueError("八桶不是 8 行：" + str(len(buckets)))
 
 r28 = []
 for r in pick(et, "序", "词", "归桶")[1:]:

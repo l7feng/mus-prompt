@@ -8,154 +8,157 @@
 <body>
   <header class="topbar">
     <div>
-      <h1>MUS Prompt</h1>
+      <img class="brand-mark" src="brand.png" alt="MUS Prompt">
       <p>影视配乐 · Suno 提示词</p>
     </div>
+    <nav class="pagenav" id="pageNav" aria-label="页面切换">
+      <button type="button" class="pagetab active" data-page="sop2" id="tab-sop2">SOP 一</button>
+      <button type="button" class="pagetab" data-page="settings" id="tab-settings">设置</button>
+    </nav>
     <div id="statusPill" class="pill pill-idle">载入中…</div>
   </header>
 
-  <main class="grid">
-    <div class="stack">
-    <section class="card" id="s0Card">
-      <h2>题材</h2>
-      <p class="hint">先选题材模板，再确认分类与取向卡。</p>
-      <div class="row two">
-        <div class="field">
-          <label for="templateId">题材模板</label>
-          <select id="templateId"></select>
-        </div>
-        <div class="field">
-          <label>模板状态</label>
-          <div id="templateBadge" class="badges"></div>
-        </div>
+  <!-- ============================================================ 页面：SOP 一（词条点选生成器） -->
+  <main class="page active" id="page-sop2">
+    <section class="card sop2-head">
+      <div class="sop2-headtext">
+        <h2>词条点选生成器 <span class="tag" id="sop2Version">词表载入中…</span></h2>
+        <p class="hint" id="sop2Hint">左侧按分类点词，右侧实时合成 SUNO 纯配乐提示词；词表整份可替换。</p>
       </div>
-      <p id="coverageLine" class="hint"></p>
-    </section>
-
-    <section class="card" id="s15Card">
-      <h2>题材分类</h2>
-      <p class="hint">四项分类决定取向卡；没有匹配时不生成。</p>
-      <div id="s15Fields" class="row two"></div>
-      <div id="cardResult" class="theme-card"></div>
-    </section>
-
-    <section class="card">
-      <h2>点选</h2>
-      <p class="hint">按词表选择，不开放自由输入。</p>
-
-      <div class="row two">
-        <div class="field">
-          <label for="bucket">情绪基调</label>
-          <select id="bucket"></select>
-        </div>
-        <div class="field">
-          <label for="topic">场景主题</label>
-          <select id="topic"></select>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>情绪词（随场景带出）</label>
-        <div id="moodWords" class="checks"></div>
-      </div>
-
-      <div class="row three">
-        <div class="field">
-          <label for="instruments">主奏乐器（基线留空，按项目口径填写）</label>
-          <input id="instruments" type="text" placeholder="〈项目填〉">
-        </div>
-        <div class="field">
-          <label for="bpm">BPM</label>
-          <input id="bpm" type="text" readonly>
-        </div>
-        <div class="field">
-          <label for="duration">建议时长</label>
-          <input id="duration" type="text" readonly>
-        </div>
-      </div>
-
-      <div class="row two">
-        <div class="field">
-          <label for="purposeProfile">用途剖面</label>
-          <input id="purposeProfile" type="text" value="通用配乐素材库">
-        </div>
-        <div class="field">
-          <label for="pictureFunction">画面功能</label>
-          <input id="pictureFunction" type="text" value="转场">
-        </div>
-      </div>
-
-      <div class="field">
-        <label for="moodArc">情绪走向（中文）</label>
-        <input id="moodArc" type="text" value="安静起 → 平稳铺陈 → 温和收束">
-      </div>
-
-      <div class="field">
-        <label for="paramDeviation">参数偏离</label>
-        <input id="paramDeviation" type="text" value="无（沿用 W25／SI80 基线）">
-      </div>
-
-      <div class="row two">
-        <div class="field">
-          <label for="exclude1">排除项 1</label>
-          <input id="exclude1" type="text" value="不写完整主题旋律">
-        </div>
-        <div class="field">
-          <label for="exclude2">排除项 2</label>
-          <input id="exclude2" type="text" value="不引入人声与戏曲音色">
-        </div>
-      </div>
-
-      <div class="row two">
-        <div class="field">
-          <label>排除词组（最多 3 组）</label>
-          <div id="negativeGroups" class="checks"></div>
-        </div>
-        <div class="field">
-          <label for="itemVersion">条目版本</label>
-          <input id="itemVersion" type="text" value="v1">
-        </div>
+      <div class="sop2-headtools">
+        <input id="aiSearch" type="text" placeholder="搜索：中文 / English / 场景 / 乐器 / 情绪">
+        <button class="secondary" id="aiClearTop" type="button">清空全部</button>
+        <button class="secondary" id="aiCopyTop" type="button">复制提示词</button>
       </div>
     </section>
+
+    <div class="sop2-body">
+      <section class="card sop2-left">
+        <div class="sop2-cols">
+          <div class="ai-catnav" id="aiCatNav"></div>
+          <div class="ai-terms" id="aiTerms"></div>
+        </div>
+      </section>
+
+      <aside class="sop2-right">
+        <section class="card">
+          <h2>当前选择</h2>
+          <div id="aiSelList" class="sel-list"></div>
+        </section>
+
+        <section class="card">
+          <h2>参数</h2>
+          <div class="sop2-params">
+            <div class="param">
+              <label for="aiBpm">BPM</label>
+              <input id="aiBpm" type="text" inputmode="numeric" placeholder="如 70">
+            </div>
+            <div class="param">
+              <label for="aiLen">时长</label>
+              <input id="aiLen" type="text" placeholder="30s / 3:30">
+            </div>
+            <div class="param checks-inline">
+              <label><input id="aiLoop" type="checkbox"> 循环</label>
+              <label><input id="aiNovoc" type="checkbox" checked> 强制无人声</label>
+              <label><input id="aiDialog" type="checkbox"> 适合对白</label>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="prompt-head">
+            <h2>SUNO BGM 提示词</h2>
+            <div class="prompt-tools">
+              <button class="secondary" id="aiResetPrompt" type="button">重置</button>
+              <button class="secondary" id="aiCopyPrompt" type="button">复制</button>
+            </div>
+          </div>
+          <textarea id="aiPrompt" class="prompt-box" rows="9" spellcheck="false"></textarea>
+          <p class="hint" id="aiPromptHint">复制到 Suno 的 Style of Music / Prompt 栏；BGM 模式不要填 Lyrics。</p>
+          <div class="export-bar">
+            <button class="secondary" id="aiExportPrompt" type="button">导出 .md</button>
+            <button class="secondary" id="sop2OpenDir" type="button" title="在资源管理器中打开导出目录">打开目录</button>
+            <span class="export-path" id="sop2Path" title="">…</span>
+          </div>
+
+          <div class="cn-head">
+            <h3>中文对照 <span class="tag cn-tag">只读</span></h3>
+            <span class="hint" id="aiPromptCnNote">按当前选择实时生成 · 只读 · 复制与导出仍用上面的英文</span>
+          </div>
+          <div id="aiPromptCn" class="prompt-cn"></div>
+        </section>
+      </aside>
     </div>
-
-    <aside class="side">
-      <section class="card lock">
-        <h2>纯器乐 <span class="tag">已锁定</span></h2>
-        <div class="field">
-          <label for="lyricsBox">歌词</label>
-          <input id="lyricsBox" class="mono" type="text" value="[Instrumental]" readonly>
-        </div>
-        <div class="copy-row">
-          <button id="copyTagBtn" type="button" class="secondary">复制 [Instrumental]</button>
-          <button id="copyPlainBtn" type="button" class="secondary">复制 Instrumental</button>
-          <span id="copyFeedback" class="copy-feedback" aria-live="polite"></span>
-        </div>
-        <div class="locked-line">
-          <input type="checkbox" checked disabled>
-          <span class="mono">no vocals</span>
-          <span class="muted">不可删</span>
-        </div>
-        <ul class="rules">
-          <li>不提供人声开关。</li>
-          <li>不生成歌曲结构标签。</li>
-        </ul>
-      </section>
-
-      <section class="card">
-        <h2>导出</h2>
-        <p class="hint">生成 1 条 Suno 提示词文件，保存在本机。</p>
-        <button id="exportBtn" type="button">生成并导出</button>
-        <pre id="resultBox" class="result">尚未生成</pre>
-      </section>
-
-      <section class="card scope">
-        <h2>说明</h2>
-        <p>英文提示词由程序自动生成，使用前请人工核对。</p>
-      </section>
-    </aside>
   </main>
 
-  <script src="renderer.js"></script>
+  <!-- ============================================================ 页面：设置 -->
+  <main class="page" id="page-settings">
+    <div class="stg-grid">
+      <div class="stg-col">
+        <section class="card">
+          <h2>页面名称</h2>
+          <p class="hint">改完即时生效，存在本机运行态，不进源码仓。</p>
+          <div class="row two stg-names">
+            <div class="field">
+              <label for="stgSop2Name">SOP 页</label>
+              <input id="stgSop2Name" type="text" maxlength="12" placeholder="SOP 一">
+            </div>
+            <div class="field">
+              <label for="stgSettingsName">设置页</label>
+              <input id="stgSettingsName" type="text" maxlength="12" placeholder="设置">
+            </div>
+          </div>
+          <div class="copy-row">
+            <button id="stgSaveNames" class="secondary" type="button">保存名称</button>
+            <button id="stgResetNames" class="secondary" type="button">恢复默认</button>
+            <span id="stgNamesMsg" class="copy-feedback" aria-live="polite"></span>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>数据与路径</h2>
+          <p class="hint">只读显示本机实值；改路径请改 <code>config/config.local.json</code>。</p>
+          <dl class="stg-dl" id="stgInfo"><dt>读取中…</dt><dd></dd></dl>
+        </section>
+
+        <section class="card">
+          <h2>说明</h2>
+          <p class="hint">
+            SOP 一 走本机词表点选，产物是纯配乐提示词；界面不写知识库文件。
+          </p>
+        </section>
+      </div>
+
+      <div class="stg-col">
+        <section class="card">
+          <div class="stg-cardhead">
+            <h2>CLI 接入</h2>
+            <button class="secondary" id="stgCopyAllCli" type="button">复制全部命令</button>
+          </div>
+          <p class="hint">便携包内置 Python，命令在应用根目录下直接跑。</p>
+          <div id="stgCli" class="cmd-list"></div>
+        </section>
+
+        <section class="card">
+          <div class="stg-cardhead">
+            <h2>MCP 接入</h2>
+            <button class="secondary" id="stgCopyMcp" type="button">复制 MCP 配置</button>
+          </div>
+          <div id="stgMcp" class="cmd-list"></div>
+          <div class="copy-row">
+            <button class="secondary" id="stgTokenBtn" type="button">查看令牌</button>
+            <span id="stgTokenMsg" class="copy-feedback" aria-live="polite"></span>
+          </div>
+          <pre id="stgTokenValue" class="result" hidden></pre>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="statusbar"><span class="status-version">配乐提示词生成 | v0.2.1</span></footer>
+
+  <script src="app.js"></script>
+  <script src="sop2.js"></script>
+  <script src="settings.js"></script>
 </body>
 </html>

@@ -1,0 +1,545 @@
+{
+  "schema": "mus-sop2-vocab-v1",
+  "version": "2026-11-13-01",
+  "source": "种子词表：仿 MATRIX WAVE 提示词生成器内置 BGM 词表（本机 D:\\MATRIX WAVE-win32-x64\\resources\\app\\static\\ai_data.json），待替换为自有词表",
+  "note": "整份可替换：改 fields / packs / templates 即可，JS 里没有任何词条常量。terms 的 en 是最终进提示词的英文，cn 只用于界面显示。",
+  "fields": [
+    {
+      "id": "usage",
+      "label": "用途 Usage",
+      "multi": true,
+      "terms": [
+        { "cn": "广播剧配乐", "en": "radio drama background music" },
+        { "cn": "有声书背景音乐", "en": "audiobook background music" },
+        { "cn": "影视配乐", "en": "cinematic background score" },
+        { "cn": "游戏配乐", "en": "game background music" },
+        { "cn": "预告片音乐", "en": "trailer music" },
+        { "cn": "情绪铺底", "en": "emotional underscore" },
+        { "cn": "紧张铺底", "en": "tension underscore" },
+        { "cn": "氛围底乐", "en": "ambient background bed" },
+        { "cn": "角色主题", "en": "character theme" },
+        { "cn": "战斗场景音乐", "en": "battle scene music" },
+        { "cn": "旅途蒙太奇", "en": "travel montage music" },
+        { "cn": "悬疑调查音乐", "en": "mystery investigation music" },
+        { "cn": "历史剧配乐", "en": "historical drama score" },
+        { "cn": "奇幻冒险配乐", "en": "fantasy adventure score" },
+        { "cn": "纪录片配乐", "en": "documentary background music" }
+      ]
+    },
+    {
+      "id": "era",
+      "label": "时代背景 Era / Setting",
+      "multi": true,
+      "groups": [
+        {
+          "name": "古代 / 历史",
+          "terms": [
+            { "cn": "古代中国", "en": "ancient China" },
+            { "cn": "唐风", "en": "Tang dynasty inspired" },
+            { "cn": "宋代风格", "en": "Song dynasty inspired" },
+            { "cn": "明代风格", "en": "Ming dynasty inspired" },
+            { "cn": "和风古代日本", "en": "ancient Japanese" },
+            { "cn": "侍时代", "en": "samurai era" },
+            { "cn": "平安时代风格", "en": "Heian period inspired" },
+            { "cn": "中世纪欧洲", "en": "medieval Europe" },
+            { "cn": "古代战场", "en": "ancient battlefield" },
+            { "cn": "宫廷", "en": "imperial palace" },
+            { "cn": "武侠世界", "en": "wuxia world" },
+            { "cn": "仙侠世界", "en": "xianxia fantasy" },
+            { "cn": "古装爱情", "en": "historical romance" },
+            { "cn": "民间传说", "en": "folk legend" }
+          ]
+        },
+        {
+          "name": "近代",
+          "terms": [
+            { "cn": "民国风", "en": "Republican-era China" },
+            { "cn": "1920年代上海", "en": "1920s Shanghai" },
+            { "cn": "1930年代黑色电影城市", "en": "1930s noir city" },
+            { "cn": "1940年代战争时期", "en": "1940s wartime" },
+            { "cn": "1950年代复古", "en": "1950s retro" },
+            { "cn": "1960年代", "en": "1960s vintage" },
+            { "cn": "1970年代怀旧", "en": "1970s nostalgic" },
+            { "cn": "1980年代都市流行", "en": "1980s city pop" },
+            { "cn": "1990年代都市剧", "en": "1990s urban drama" },
+            { "cn": "老式广播剧", "en": "old radio drama" },
+            { "cn": "老电影配乐", "en": "vintage film score" }
+          ]
+        },
+        {
+          "name": "现代",
+          "terms": [
+            { "cn": "现代都市", "en": "modern city" },
+            { "cn": "安静夜晚都市", "en": "quiet night city" },
+            { "cn": "雨夜街道", "en": "rainy city street" },
+            { "cn": "职场生活", "en": "office life" },
+            { "cn": "校园生活", "en": "school life" },
+            { "cn": "家庭剧", "en": "family drama" },
+            { "cn": "现代儿童故事", "en": "children's story" },
+            { "cn": "都市爱情", "en": "urban romance" },
+            { "cn": "日常生活", "en": "daily life slice-of-life" },
+            { "cn": "孤独公寓", "en": "lonely apartment" },
+            { "cn": "夜间地铁", "en": "subway at night" },
+            { "cn": "医疗剧", "en": "hospital drama" },
+            { "cn": "刑侦调查", "en": "police investigation" }
+          ]
+        },
+        {
+          "name": "未来 / 科技",
+          "terms": [
+            { "cn": "未来都市", "en": "futuristic city" },
+            { "cn": "赛博朋克城市", "en": "cyberpunk city" },
+            { "cn": "科幻飞船", "en": "sci-fi spaceship" },
+            { "cn": "AI实验室", "en": "AI laboratory" },
+            { "cn": "末日世界", "en": "post-apocalyptic world" },
+            { "cn": "反乌托邦未来", "en": "dystopian future" },
+            { "cn": "太空探索", "en": "space exploration" },
+            { "cn": "外星星球", "en": "alien planet" },
+            { "cn": "高科技企业", "en": "high-tech corporation" },
+            { "cn": "虚拟现实世界", "en": "virtual reality world" },
+            { "cn": "机器人文明", "en": "robot civilization" },
+            { "cn": "时间穿越", "en": "time travel" }
+          ]
+        },
+        {
+          "name": "奇幻 / 其他",
+          "terms": [
+            { "cn": "黑暗奇幻", "en": "dark fantasy" },
+            { "cn": "高魔奇幻", "en": "high fantasy" },
+            { "cn": "魔法森林", "en": "magical forest" },
+            { "cn": "古代遗迹", "en": "ancient ruins" },
+            { "cn": "鬼屋", "en": "haunted mansion" },
+            { "cn": "梦境世界", "en": "dream world" },
+            { "cn": "水下世界", "en": "underwater world" },
+            { "cn": "沙漠王国", "en": "desert kingdom" },
+            { "cn": "雪山", "en": "snow mountain" },
+            { "cn": "神殿", "en": "sacred temple" },
+            { "cn": "神秘洞穴", "en": "mysterious cave" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "scene",
+      "label": "场景 Scene",
+      "multi": true,
+      "terms": [
+        { "cn": "安静对话", "en": "quiet conversation" },
+        { "cn": "情感告白", "en": "emotional confession" },
+        { "cn": "离别场景", "en": "farewell scene" },
+        { "cn": "重逢场景", "en": "reunion scene" },
+        { "cn": "孤独独白", "en": "lonely monologue" },
+        { "cn": "回忆闪回", "en": "memory flashback" },
+        { "cn": "独自行走", "en": "walking alone" },
+        { "cn": "夜间调查", "en": "night investigation" },
+        { "cn": "悬疑发现", "en": "suspenseful discovery" },
+        { "cn": "秘密会面", "en": "secret meeting" },
+        { "cn": "宫廷权谋", "en": "palace intrigue" },
+        { "cn": "战前战场", "en": "battlefield before war" },
+        { "cn": "追逐", "en": "chase scene" },
+        { "cn": "逃亡", "en": "escape scene" },
+        { "cn": "暗藏危险", "en": "hidden danger" },
+        { "cn": "真相揭露", "en": "mystery reveal" },
+        { "cn": "悲伤结局", "en": "sad ending" },
+        { "cn": "希望结局", "en": "hopeful ending" },
+        { "cn": "温馨家庭", "en": "warm family moment" },
+        { "cn": "儿童冒险", "en": "children adventure" },
+        { "cn": "轻喜剧日常", "en": "comedy daily scene" },
+        { "cn": "恐怖紧张", "en": "horror tension" },
+        { "cn": "仪式场景", "en": "ritual ceremony" },
+        { "cn": "英雄登场", "en": "heroic entrance" },
+        { "cn": "反派主题", "en": "villain theme" },
+        { "cn": "爱情主题", "en": "love theme" },
+        { "cn": "死亡场景", "en": "death scene" },
+        { "cn": "梦境段落", "en": "dream sequence" }
+      ]
+    },
+    {
+      "id": "mood",
+      "label": "情绪 Mood",
+      "multi": true,
+      "terms": [
+        { "cn": "神秘", "en": "mysterious" },
+        { "cn": "沉思压抑", "en": "brooding" },
+        { "cn": "忧郁", "en": "melancholic" },
+        { "cn": "怀旧", "en": "nostalgic" },
+        { "cn": "孤独", "en": "lonely" },
+        { "cn": "内省", "en": "reflective" },
+        { "cn": "希望感", "en": "hopeful" },
+        { "cn": "温暖", "en": "warm" },
+        { "cn": "轻柔", "en": "gentle" },
+        { "cn": "平静", "en": "calm" },
+        { "cn": "宁静", "en": "serene" },
+        { "cn": "俏皮", "en": "playful" },
+        { "cn": "快乐", "en": "happy" },
+        { "cn": "英雄感", "en": "heroic" },
+        { "cn": "史诗", "en": "epic" },
+        { "cn": "奇幻", "en": "magical" },
+        { "cn": "紧张", "en": "tense" },
+        { "cn": "黑暗", "en": "dark" },
+        { "cn": "粗粝", "en": "gritty" },
+        { "cn": "活力", "en": "energetic" },
+        { "cn": "强有力", "en": "powerful" },
+        { "cn": "轻快", "en": "breezy" },
+        { "cn": "律动", "en": "groovy" },
+        { "cn": "浪漫", "en": "romantic" }
+      ]
+    },
+    {
+      "id": "atmosphere",
+      "label": "空间氛围 Atmosphere",
+      "multi": true,
+      "terms": [
+        { "cn": "小房间亲密感", "en": "intimate small room" },
+        { "cn": "开阔风景", "en": "wide open landscape" },
+        { "cn": "空旷街道", "en": "empty street" },
+        { "cn": "雨夜", "en": "rainy night" },
+        { "cn": "雾气清晨", "en": "misty morning" },
+        { "cn": "烛光房间", "en": "candlelit room" },
+        { "cn": "古代宫殿大厅", "en": "ancient palace hall" },
+        { "cn": "寺庙氛围", "en": "temple ambience" },
+        { "cn": "森林氛围", "en": "forest ambience" },
+        { "cn": "战场尘土感", "en": "battlefield dust" },
+        { "cn": "寒冷冬夜", "en": "cold winter air" },
+        { "cn": "温暖怀旧房间", "en": "warm nostalgic room" },
+        { "cn": "霓虹城市", "en": "neon city lights" },
+        { "cn": "地下通道", "en": "underground tunnel" },
+        { "cn": "未来实验室", "en": "futuristic laboratory" },
+        { "cn": "广阔太空", "en": "vast outer space" },
+        { "cn": "诡异寂静", "en": "eerie silence" },
+        { "cn": "梦幻空间", "en": "dreamlike space" },
+        { "cn": "阳光庭院", "en": "sunlit courtyard" },
+        { "cn": "喧闹市集", "en": "crowded marketplace" }
+      ]
+    },
+    {
+      "id": "motion",
+      "label": "镜头感 Motion",
+      "multi": true,
+      "terms": [
+        { "cn": "缓慢情绪推进", "en": "slow emotional build" },
+        { "cn": "静态紧张", "en": "quiet tension" },
+        { "cn": "逐渐悬疑增强", "en": "gradual suspense build" },
+        { "cn": "突然戏剧性增强", "en": "sudden dramatic rise" },
+        { "cn": "柔和情绪膨胀", "en": "soft emotional swell" },
+        { "cn": "电影感上升", "en": "cinematic rise" },
+        { "cn": "平静铺底", "en": "calm background underscore" },
+        { "cn": "脉冲式紧张", "en": "pulsing tension" },
+        { "cn": "稳定行走节奏", "en": "steady walking rhythm" },
+        { "cn": "追逐动势", "en": "chase-like momentum" },
+        { "cn": "英雄式推进", "en": "heroic build-up" },
+        { "cn": "悲剧高潮", "en": "tragic climax" },
+        { "cn": "神秘揭示", "en": "mysterious reveal" },
+        { "cn": "怀旧闪回", "en": "nostalgic flashback" },
+        { "cn": "梦境漂浮感", "en": "dreamlike floating motion" },
+        { "cn": "长镜头呼吸感", "en": "long take breathing pace" },
+        { "cn": "快速剪辑推进", "en": "fast cut momentum" }
+      ]
+    },
+    {
+      "id": "instr",
+      "label": "乐器 Instruments",
+      "multi": true,
+      "groups": [
+        {
+          "name": "键盘 / 弦乐",
+          "terms": [
+            { "cn": "钢琴", "en": "piano" },
+            { "cn": "电钢琴", "en": "electric piano" },
+            { "cn": "钢琴脉冲", "en": "piano pulses" },
+            { "cn": "柔和弦乐", "en": "soft strings" },
+            { "cn": "弦乐", "en": "strings" },
+            { "cn": "低音弦乐", "en": "low strings" },
+            { "cn": "拨弦弦乐", "en": "pizzicato strings" },
+            { "cn": "复古弦乐", "en": "vintage strings" },
+            { "cn": "模拟弦乐", "en": "analog strings" },
+            { "cn": "不协和弦乐", "en": "dissonant strings" },
+            { "cn": "竖琴", "en": "harp" }
+          ]
+        },
+        {
+          "name": "民族 / 古代",
+          "terms": [
+            { "cn": "古筝", "en": "guzheng" },
+            { "cn": "琵琶", "en": "pipa" },
+            { "cn": "二胡", "en": "erhu" },
+            { "cn": "竹笛", "en": "bamboo flute" },
+            { "cn": "尺八", "en": "shakuhachi" },
+            { "cn": "日本筝", "en": "koto" },
+            { "cn": "三味线", "en": "shamisen" },
+            { "cn": "鲁特琴", "en": "lute" },
+            { "cn": "竖笛", "en": "recorder" },
+            { "cn": "中国打击乐", "en": "Chinese percussion" },
+            { "cn": "太鼓", "en": "taiko drums" },
+            { "cn": "框鼓", "en": "frame drum" }
+          ]
+        },
+        {
+          "name": "吉他 / 低音",
+          "terms": [
+            { "cn": "木吉他", "en": "acoustic guitar" },
+            { "cn": "电吉他", "en": "electric guitar" },
+            { "cn": "温暖贝斯", "en": "warm bass" },
+            { "cn": "贝斯", "en": "bass guitar" },
+            { "cn": "脉冲贝斯", "en": "pulsing bass" },
+            { "cn": "暗色合成贝斯", "en": "dark synth bass" }
+          ]
+        },
+        {
+          "name": "合成器 / 氛围",
+          "terms": [
+            { "cn": "合成器", "en": "synthesizer" },
+            { "cn": "合成器铺底", "en": "synth pads" },
+            { "cn": "氛围铺底", "en": "ambient pads" },
+            { "cn": "柔和合成器铺底", "en": "soft synth pads" },
+            { "cn": "暗色铺底", "en": "dark pads" },
+            { "cn": "诡异铺底", "en": "eerie pads" },
+            { "cn": "失真铺底", "en": "distorted pads" },
+            { "cn": "魔法铺底", "en": "magical pads" },
+            { "cn": "低音持续音", "en": "low drones" },
+            { "cn": "反向音效", "en": "reversed textures" }
+          ]
+        },
+        {
+          "name": "打击 / 音效",
+          "terms": [
+            { "cn": "轻打击乐", "en": "subtle percussion" },
+            { "cn": "轻击打点", "en": "light percussion" },
+            { "cn": "原声鼓", "en": "acoustic drums" },
+            { "cn": "柔和鼓", "en": "soft drums" },
+            { "cn": "电子鼓", "en": "electronic drums" },
+            { "cn": "工业鼓", "en": "industrial drums" },
+            { "cn": "故障打击", "en": "glitch percussion" },
+            { "cn": "故障音效", "en": "glitch effects" },
+            { "cn": "金属敲击", "en": "metallic hits" },
+            { "cn": "远处敲击", "en": "distant hits" }
+          ]
+        },
+        {
+          "name": "色彩 / 其他",
+          "terms": [
+            { "cn": "八音盒", "en": "music box" },
+            { "cn": "尤克里里", "en": "ukulele" },
+            { "cn": "钟琴", "en": "glockenspiel" },
+            { "cn": "钢片琴", "en": "celesta" },
+            { "cn": "合唱", "en": "choir" },
+            { "cn": "木管", "en": "woodwinds" },
+            { "cn": "弱音小号", "en": "muted trumpet" },
+            { "cn": "手风琴", "en": "accordion" },
+            { "cn": "口琴", "en": "harmonica" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rhythm",
+      "label": "节奏 Rhythm",
+      "multi": true,
+      "terms": [
+        { "cn": "慢速", "en": "slow tempo" },
+        { "cn": "中速", "en": "medium tempo" },
+        { "cn": "稳定4/4节奏", "en": "steady 4/4 rhythm" },
+        { "cn": "极简节奏", "en": "minimal rhythm" },
+        { "cn": "脉冲节奏", "en": "pulsing rhythm" },
+        { "cn": "自由速度氛围感", "en": "free time ambient feel" },
+        { "cn": "半速感", "en": "half-time feel" },
+        { "cn": "散板呼吸", "en": "breath-like rubato pulse" }
+      ]
+    },
+    {
+      "id": "keymode",
+      "label": "调式 Key",
+      "single": true,
+      "terms": [
+        { "cn": "大调", "en": "major key" },
+        { "cn": "小调", "en": "minor key" },
+        { "cn": "多利亚调式", "en": "dorian mode" },
+        { "cn": "利底亚调式", "en": "lydian mode" },
+        { "cn": "混合利底亚调式", "en": "mixolydian mode" },
+        { "cn": "弗里吉亚调式", "en": "phrygian mode" },
+        { "cn": "和声小调", "en": "harmonic minor" },
+        { "cn": "五声音阶", "en": "pentatonic scale" },
+        { "cn": "无明确调性", "en": "no fixed key center" }
+      ]
+    },
+    {
+      "id": "bgmStructure",
+      "label": "配乐结构 BGM Structure",
+      "single": true,
+      "terms": [
+        { "cn": "无缝循环", "en": "seamless loop" },
+        { "cn": "短循环片段", "en": "short loopable cue" },
+        { "cn": "氛围铺底", "en": "ambient underscore" },
+        { "cn": "缓慢变化", "en": "slowly evolving texture" },
+        { "cn": "主题变奏", "en": "theme and variations" },
+        { "cn": "极简重复动机", "en": "minimal repetitive motif" },
+        { "cn": "电影短配乐柔和结尾", "en": "cinematic cue with soft ending" },
+        { "cn": "不解决的紧张配乐", "en": "tension cue with no resolution" },
+        { "cn": "情绪配乐柔和高潮", "en": "emotional cue with gentle climax" },
+        { "cn": "起承转合结构", "en": "intro - build - climax - outro" }
+      ]
+    },
+    {
+      "id": "production",
+      "label": "制作 Production",
+      "multi": true,
+      "terms": [
+        { "cn": "温暖亲密制作", "en": "warm intimate production" },
+        { "cn": "宽立体声混响", "en": "wide stereo reverb" },
+        { "cn": "低保真磁带质感", "en": "lo-fi tape texture" },
+        { "cn": "现代精致制作", "en": "modern polished production" },
+        { "cn": "复古模拟音色", "en": "vintage analog sound" },
+        { "cn": "电影管弦制作", "en": "cinematic orchestral production" },
+        { "cn": "极简干净制作", "en": "minimal clean production" },
+        { "cn": "温暖磁带声", "en": "warm tape sound" },
+        { "cn": "空间氛围混音", "en": "spacious ambient mix" },
+        { "cn": "老收音机质感", "en": "old radio texture" },
+        { "cn": "近场亲密混音", "en": "close intimate mix" },
+        { "cn": "单声道复古广播感", "en": "mono vintage broadcast feel" }
+      ]
+    },
+    {
+      "id": "ending",
+      "label": "结尾 Ending",
+      "single": true,
+      "terms": [
+        { "cn": "柔和淡出", "en": "soft fade out" },
+        { "cn": "柔和高潮", "en": "gentle climax" },
+        { "cn": "硬切结束", "en": "hard stop" },
+        { "cn": "渐慢结尾", "en": "ritardando" },
+        { "cn": "延音收尾", "en": "sustained final chord" },
+        { "cn": "可循环结尾", "en": "loopable" },
+        { "cn": "不解决结尾", "en": "unresolved" },
+        { "cn": "淡出悬停", "en": "fading suspension" },
+        { "cn": "尾音留白", "en": "tail reverb tail" }
+      ]
+    }
+  ],
+  "packs": [
+    { "cn": "古代中国", "instr": "guzheng, pipa, erhu, bamboo flute, Chinese percussion, soft strings" },
+    { "cn": "古代日本", "instr": "shakuhachi, koto, shamisen, taiko drums, airy pads" },
+    { "cn": "中世纪欧洲", "instr": "lute, harp, recorder, frame drum, choir, strings" },
+    { "cn": "民国", "instr": "piano, erhu, muted trumpet, accordion, vintage strings" },
+    { "cn": "70年代怀旧", "instr": "electric piano, warm bass, soft drums, analog strings" },
+    { "cn": "现代都市", "instr": "piano, soft synth pads, electric guitar, subtle percussion, warm bass" },
+    { "cn": "现代儿童", "instr": "music box, ukulele, pizzicato strings, glockenspiel, light percussion" },
+    { "cn": "未来科技", "instr": "synthesizer, ambient pads, pulsing bass, electronic drums, glitch effects" },
+    { "cn": "赛博朋克", "instr": "dark synth bass, industrial drums, distorted pads, glitch percussion" },
+    { "cn": "奇幻", "instr": "harp, celesta, choir, strings, woodwinds, magical pads" },
+    { "cn": "悬疑", "instr": "low strings, piano pulses, dark pads, subtle percussion, distant hits" },
+    { "cn": "恐怖", "instr": "dissonant strings, eerie pads, reversed textures, low drones, metallic hits" }
+  ],
+  "templates": [
+    {
+      "cn": "古代宫廷权谋",
+      "bpm": "65",
+      "loop": true,
+      "dialogue": true,
+      "sel": {
+        "usage": ["historical drama score"],
+        "era": ["ancient China", "imperial palace"],
+        "scene": ["palace intrigue", "secret meeting"],
+        "mood": ["mysterious", "brooding"],
+        "atmosphere": ["ancient palace hall", "candlelit room"],
+        "motion": ["quiet tension", "slow emotional build"],
+        "instr": ["guzheng", "pipa", "bamboo flute", "soft strings", "Chinese percussion"],
+        "bgmStructure": ["minimal repetitive motif"],
+        "ending": ["unresolved"]
+      }
+    },
+    {
+      "cn": "民国雨夜",
+      "bpm": "70",
+      "loop": true,
+      "dialogue": true,
+      "sel": {
+        "usage": ["cinematic background score"],
+        "era": ["Republican-era China", "1920s Shanghai", "rainy city street"],
+        "scene": ["lonely monologue"],
+        "mood": ["melancholic", "nostalgic"],
+        "atmosphere": ["rainy night", "warm nostalgic room"],
+        "motion": ["soft emotional swell"],
+        "instr": ["piano", "erhu", "muted trumpet", "accordion", "vintage strings"],
+        "production": ["warm tape sound"],
+        "bgmStructure": ["emotional cue with gentle climax"],
+        "ending": ["soft fade out"]
+      }
+    },
+    {
+      "cn": "现代都市夜晚",
+      "bpm": "75",
+      "loop": true,
+      "dialogue": true,
+      "sel": {
+        "usage": ["audiobook background music"],
+        "era": ["modern city", "quiet night city", "rainy city street"],
+        "scene": ["lonely monologue"],
+        "mood": ["lonely", "reflective"],
+        "atmosphere": ["neon city lights", "empty street"],
+        "motion": ["calm background underscore"],
+        "instr": ["piano", "soft synth pads", "electric guitar", "warm bass"],
+        "production": ["wide stereo reverb"],
+        "bgmStructure": ["ambient underscore"],
+        "ending": ["soft fade out"]
+      }
+    },
+    {
+      "cn": "儿童故事",
+      "bpm": "95",
+      "loop": true,
+      "dialogue": true,
+      "sel": {
+        "usage": ["audiobook background music"],
+        "era": ["children's story"],
+        "scene": ["warm family moment", "children adventure"],
+        "mood": ["playful", "happy", "warm"],
+        "atmosphere": ["warm nostalgic room"],
+        "motion": ["calm background underscore"],
+        "instr": ["music box", "ukulele", "pizzicato strings", "glockenspiel", "light percussion"],
+        "bgmStructure": ["short loopable cue"],
+        "ending": ["soft fade out"]
+      }
+    },
+    {
+      "cn": "未来科技实验室",
+      "bpm": "100",
+      "loop": true,
+      "dialogue": false,
+      "sel": {
+        "usage": ["game background music"],
+        "era": ["AI laboratory", "futuristic city"],
+        "scene": ["suspenseful discovery"],
+        "mood": ["mysterious", "tense"],
+        "atmosphere": ["futuristic laboratory"],
+        "motion": ["pulsing tension"],
+        "instr": ["synthesizer", "ambient pads", "pulsing bass", "electronic drums", "glitch effects"],
+        "bgmStructure": ["minimal repetitive motif"],
+        "ending": ["loopable"]
+      }
+    },
+    {
+      "cn": "中世纪幻想冒险",
+      "bpm": "110",
+      "loop": false,
+      "dialogue": false,
+      "sel": {
+        "usage": ["fantasy adventure score"],
+        "era": ["medieval Europe", "high fantasy"],
+        "scene": ["heroic entrance"],
+        "mood": ["heroic", "magical"],
+        "atmosphere": ["wide open landscape"],
+        "motion": ["heroic build-up", "cinematic rise"],
+        "instr": ["harp", "lute", "choir", "strings", "woodwinds", "frame drum"],
+        "bgmStructure": ["theme and variations"],
+        "ending": ["gentle climax"]
+      }
+    }
+  ],
+  "dialogue_usages": [
+    "radio drama background music",
+    "audiobook background music",
+    "cinematic background score",
+    "historical drama score",
+    "documentary background music"
+  ]
+}

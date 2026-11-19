@@ -1,6 +1,6 @@
 {
   "name": "mus-prompt",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "private": true,
   "description": "MUS Prompt（配乐提示词点选生成器，Electron 桌面应用）：词表只读派生自库内模板，导出 1 条 -Suno.md 并静态自检",
   "main": "src/main/main.js",

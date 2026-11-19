@@ -24,7 +24,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import cli  # noqa: E402
 
 SERVER_NAME = "mus-prompt"
-SERVER_VERSION = "0.2.0"
+SERVER_VERSION = "0.2.1"
 SUPPORTED_VERSIONS = ("2025-06-18", "2025-03-26", "2024-11-05")
 DEFAULT_VENDOR = "MUS Prompt（配乐提示词生成器）"
 

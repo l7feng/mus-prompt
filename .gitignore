@@ -24,3 +24,9 @@ __pycache__/
 
 # 本机运行时位置（每台机器不同，不入库）
 config/electron-home.txt
+
+# 本地备份（agent 整理，2026-11-19）
+*.bak-*
+*_bak-*
+.venv.bak-*
+

@@ -4,6 +4,10 @@
 
 | 日期 | 提交 | 说明 |
 | --- | --- | --- |
+| 2026-11-19 | 工作区（未提交） | 删页：去掉旧的 SOP 一（题材分流 + 取向卡），原 SOP 二 词条点选页改名 **SOP 一**，与设置页并列，页签只剩「SOP 一 / 设置」；`index.html` 删掉旧页整块与 `sop1.js` 引用（脚本留档 `sop1.js.bak-20261119-removed`），`app.js`／`main.js` 的 `PAGE_KEYS`、`DEFAULT_PAGE_NAMES`、`--probe` 断言同步收敛到两页，设置页页面名输入从三项减为两项；顶栏状态灯改由词表载入驱动（`词表已就位`／`词表异常`），不再挂在已删的契约校验上 |
+| 2026-11-14 | 工作区（未提交） | 两页导出按钮旁新增**输出路径条 + 一键跟过去**：SOP 一「生成并导出」、SOP 二「导出 .md」各带一条路径（默认显示 `…\state\exports`，完整路径在悬停提示里），点路径或旁边「打开目录」即在资源管理器跳过去；导出成功后路径条换成产物文件名，一点就定位到该文件。主进程新增 `export:dir`、`export:reveal`（`shell.openPath`／`shell.showItemInFolder`，`basename` 归一后校验仍在 `state/exports` 内）；preload 增加 `exportDir`／`revealExport`；`app.js` 抽出 `mountExportPath` 供两页复用。SOP 二 的「导出 .md」由标题行移入提示词下方的按钮条。`--probe` 增加 `exportPaths`／`exportPathsAfter`／`revealGuard` 与路径条版面量尺 |
+| 2026-11-14 | 工作区（未提交） | SOP 二 提示词下新增**只读中文对照**：同一句式骨架、同一分支条件逐行生成中文（总述／用途·时代·场景／情绪·氛围／乐器／律动·制作·参数／结构与时长／循环／对白友好／人声限制），词条取 `cn`、参数取实名；英文提示词与「复制」内容一字未改。导出 `.md` 追加「## 中文对照（只读，不进 Style 栏）」段；手改英文后中文块改标「仅作对照」。`--probe` 增加 `snap.cnLines/cnHead` 与 `sop2Layout`（中文块可见高度、横向溢出、标签截断、body 溢出）版面量尺 |
+| 2026-11-13 | 工作区（未提交） | 双页化：原界面成为 SOP 一，新增 SOP 二（词条点选生成器，`config/sop2-vocab.json` 为唯一词表真源，句式骨架与 MATRIX WAVE 提示词生成器同构）与设置页（页面改名、路径只读、CLI 命令、MCP stdio/HTTP 与令牌查看）；主进程新增 `ui:load/save`、`sop2:load/export`、`clipboard:write-text`、`app:info`、`mcp:token`；新增 `--probe` DOM 断言验收；`scripts/build.py` 适配库内 `01-情绪框架.md` 2026-11-12 改版表头 |
 | 2026-11-11 | `4bf221c` | 精简界面与导出文案：去掉契约状态栏、页脚、工程阶段与技术校验说明；标题改为「影视配乐 · Suno 提示词」，标签与提示改为平实中文，结果区只显示文件名；导出文件去掉项目阶段、哈希、来源表和自检说明，只保留条目、Styles、中文翻译与歌词框 |
 | 2026-11-11 | `2499623` | 增加 AI 接入：`scripts/cli.py`（status／templates／fields／cues／schema／resolve／render）与 `scripts/mcp_server.py`（stdio、Streamable HTTP、旧版 SSE，Bearer 令牌与私网白名单）；`render.py` 增加 `--resolve-only`；AI 可自动解析取向卡，落盘限 `state/` 三子目录，无卡与自检失败即拦截 |
 | 2026-11-11 | `800444f` | 接入 S0 题材分流与 S1.5：中国/世界两套模板、四字段受控词表与 20 张取向卡；无卡不生成，中国音色域覆盖时显式降级；数据版本 `2026-11-11-02` |
